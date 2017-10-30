@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_navigation_view_switch_uesr"
+        android:icon="@drawable/ic_switch_user"
+        android:title="切换用户"/>
+    <item
+        android:id="@+id/menu_navigation_view_law_regulations"
+        android:icon="@drawable/law"
+        android:title="法律法规"/>
+</menu>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="cn.eyesw.lvenxunjian">
+
+    <!-- 打电话权限(API23 以后还要重写一些方法) -->
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <!-- 读取和写入到内存卡中 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!-- 相机权限 -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- 网络状态 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- 获取设备网络状态，禁用后无法获取网络状态 -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- 网络权限，当禁用后，无法进行检索等相关业务 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <!-- 读取设备硬件信息，统计数据 -->
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS"/>
+    <!-- 读取系统信息，包含系统版本等信息，用作统计 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <!-- 获取设备的网络状态，鉴权所需网络代理 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!-- 允许sd卡写权限，需写入地图数据，禁用后无法显示地图 -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <!-- 获取统计数据 -->
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <!-- 鉴权所需该权限获取进程列表 -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+
+    <application
+        android:name=".LvenXunJianApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/app_launcher"
+        android:label="@string/app_name"
+        android:persistent="true"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <!-- ********** 百度定图配置 START ********** -->
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="QW1Aer1I2s72GbBgitrSXH6qWUjaEkT4"/>
+
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote"/>
+        <!-- ********** 百度地图配置  END  ********** -->
+
+        <activity
+            android:name=".SplashActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".LoginActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.PatrolTaskActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.SettingActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.PatrolRecordActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.PatrolUploadActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.EmergencyAlarmActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"/>
+        <activity
+            android:name=".ui.HiddenReportActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"/>
+        <activity
+            android:name=".ui.UserActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.DetailActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.LawRegulationActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.RegulationListActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.RegulationDetailActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.MyMessageActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.BaiduActivity"
+            android:screenOrientation="portrait"/>
+
+        <receiver android:name=".receiver.NetWorkReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".service.UploadPictureService"
+            android:enabled="true"
+            android:exported="true"/>
+        <service
+            android:name=".service.UpdateClockService"
+            android:enabled="true"
+            android:exported="true"/>
+
+        <!-- Android 7.0 问题 -->
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="cn.eyesw.lvenxunjian.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+
+            <!-- 元数据 -->
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
+
+    </application>
+
+</manifest>

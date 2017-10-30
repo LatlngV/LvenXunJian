@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/login_bground">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/login_toolbar"
+        style="@style/ToolbarStyle"/>
+
+    <LinearLayout
+        android:id="@+id/login_ll_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@drawable/login_linear_layout_bg"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/login_et_username"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/login_edit_text_bg"
+            android:hint="@string/phone_number"
+            android:inputType="phone"
+            android:paddingLeft="15dp"/>
+
+        <EditText
+            android:id="@+id/login_et_password"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/login_edit_text_bg"
+            android:hint="@string/password"
+            android:inputType="numberPassword"
+            android:paddingLeft="15dp"/>
+
+        <Button
+            android:id="@+id/login_btn_login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/dp_10_y"
+            android:text="@string/login"/>
+
+        <TextView
+            android:id="@+id/login_tv_forget_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="15dp"
+            android:layout_marginTop="@dimen/dp_15_y"
+            android:text="@string/forget_password"
+            android:textColor="@color/red"
+            android:textSize="25sp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/login_tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dp_155_y"
+        android:background="@drawable/login_text_view_bg"
+        android:padding="5dp"
+        android:text="LVEN管道巡检管理系统"
+        android:textSize="15sp"/>
+
+</RelativeLayout>

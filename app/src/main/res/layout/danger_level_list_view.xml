@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/item_danger_level_name"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dp_40_y"
+        android:layout_marginLeft="@dimen/dp_10_x"
+        android:gravity="center_vertical"
+        android:text="一级事故"
+        android:textColor="@color/black"
+        android:textSize="18sp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:background="#88000000"/>
+
+</LinearLayout>

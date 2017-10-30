@@ -1,0 +1,91 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="cn.eyesw.lvenxunjian.fragment.YearRecordFragment">
+
+    <LinearLayout
+        android:id="@+id/month_record_ll_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_40_y"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="110dp"
+            android:layout_height="match_parent"
+            android:background="#44000000"
+            android:gravity="center"
+            android:text="日期"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+
+        <View
+            android:layout_width="@dimen/dp_1_x"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#44000000"
+            android:gravity="center"
+            android:text="完成量"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+
+        <View
+            android:layout_width="@dimen/dp_1_x"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#44000000"
+            android:gravity="center"
+            android:text="总数"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+
+        <View
+            android:layout_width="@dimen/dp_1_x"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#44000000"
+            android:gravity="center"
+            android:text="完成率(%)"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/month_record_line"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:layout_below="@+id/month_record_ll_container"
+        android:background="@color/white"/>
+
+    <ListView
+        android:id="@+id/month_record_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/month_record_line"/>
+
+    <TextView
+        android:id="@+id/month_record_tv_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="当前网络不可用"
+        android:textColor="@color/red"
+        android:textSize="25sp"
+        android:visibility="gone"/>
+
+</RelativeLayout>
+

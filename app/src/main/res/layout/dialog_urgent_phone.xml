@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50_y"
+        android:gravity="center_vertical"
+        android:text="紧急报警电话"
+        android:layout_marginLeft="@dimen/dp_10_x"
+        android:textColor="@color/red"
+        android:textSize="18sp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:background="#44000000"/>
+
+    <EditText
+        android:id="@+id/dialog_et_input_phone"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50_y"
+        android:hint="紧急联系人电话"
+        android:inputType="phone"
+        android:paddingLeft="@dimen/dp_5_x"
+        android:textColor="@color/black"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:background="#44000000"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/dialog_btn_confirm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="确定"
+            android:textColor="@color/red"/>
+
+        <Button
+            android:id="@+id/dialog_btn_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="取消"
+            android:textColor="@color/red"/>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/upload_toolbar"
+        style="@style/ToolbarStyle"/>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/upload_card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/upload_toolbar"
+        app:cardBackgroundColor="#999999"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="2dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/upload_tv_weizhi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="位置:"
+                android:textColor="@color/black"
+                android:textSize="22sp"/>
+
+            <TextView
+                android:id="@+id/upload_tv_adress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_toRightOf="@+id/upload_tv_weizhi"
+                android:textColor="@color/red"
+                android:textSize="22sp"/>
+
+            <TextView
+                android:id="@+id/upload_tv_riqi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/upload_tv_adress"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="5dp"
+                android:text="日期:"
+                android:textColor="@color/black"
+                android:textSize="22sp"/>
+
+            <TextView
+                android:id="@+id/upload_tv_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/upload_tv_adress"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@+id/upload_tv_riqi"
+                android:textColor="@color/red"
+                android:textSize="22sp"
+                tools:text="2017-03-18 "/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <ImageView
+        android:id="@+id/upload_image_view"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_below="@+id/upload_card_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/timg"/>
+
+    <Button
+        android:id="@+id/upload_btn_commit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/upload_image_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="提交"
+        android:background="@drawable/btn_commit"
+        android:textColor="#00ee76"
+        android:textSize="20sp"/>
+
+    <TextView
+        android:id="@+id/upload_tv_refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:padding="13dp"
+        android:text="刷新"
+        android:textColor="@color/red"
+        android:textSize="25sp"/>
+
+</RelativeLayout>

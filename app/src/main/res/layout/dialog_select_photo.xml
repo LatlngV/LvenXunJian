@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/user_dialog_bg"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_15_y"
+        android:paddingLeft="@dimen/dp_15_x"
+        android:text="选择上传照片的方式"
+        android:textColor="@color/black"
+        android:textSize="25sp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:layout_marginTop="@dimen/dp_10_y"
+        android:background="#4000"/>
+
+    <TextView
+        android:id="@+id/user_dialog_tv_camera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="@dimen/dp_10_y"
+        android:paddingTop="@dimen/dp_10_y"
+        android:text="拍照"
+        android:textColor="@color/red"
+        android:textSize="25sp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:background="#4000"/>
+
+    <TextView
+        android:id="@+id/user_dialog_tv_album"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="@dimen/dp_10_y"
+        android:paddingTop="@dimen/dp_10_y"
+        android:text="相册"
+        android:textColor="@color/red"
+        android:textSize="25sp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:background="#4000"/>
+
+    <TextView
+        android:id="@+id/user_dialog_tv_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="@dimen/dp_15_y"
+        android:paddingTop="@dimen/dp_10_y"
+        android:text="取消"
+        android:textColor="@android:color/holo_orange_light"
+        android:textSize="25sp"/>
+
+</LinearLayout>

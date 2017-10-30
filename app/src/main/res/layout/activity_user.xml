@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/uesr_toolbar"
+        style="@style/ToolbarStyle"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:layout_marginTop="@dimen/dp_15_y"
+        android:background="#44000000"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp_10_x"
+        android:layout_marginRight="@dimen/dp_10_x"
+        android:layout_marginTop="@dimen/dp_5_y">
+
+        <TextView
+            style="@style/UserInfoTextView"
+            android:text="头像"/>
+
+        <cn.eyesw.lvenxunjian.widget.CircleImageView
+            android:id="@+id/user_circl_image_view"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/center_portrait"
+            app:border_color="@color/yellow"
+            app:border_width="1dp"/>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:layout_marginTop="@dimen/dp_5_y"
+        android:background="#44000000"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_48_y"
+        android:layout_marginLeft="@dimen/dp_10_x"
+        android:layout_marginRight="@dimen/dp_10_x"
+        android:layout_marginTop="@dimen/dp_5_y">
+
+        <TextView
+            style="@style/UserInfoTextView"
+            android:text="姓名"/>
+
+        <TextView
+            android:id="@+id/uesr_tv_staff_name"
+            style="@style/UserInfoTextView"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_5_x"
+            android:textColor="@color/red"
+            tools:text="习近平"/>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:layout_marginTop="@dimen/dp_5_y"
+        android:background="#44000000"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_48_y"
+        android:layout_marginLeft="@dimen/dp_10_x"
+        android:layout_marginRight="@dimen/dp_10_x"
+        android:layout_marginTop="@dimen/dp_5_y">
+
+        <TextView
+            style="@style/UserInfoTextView"
+            android:text="职位"/>
+
+        <TextView
+            android:id="@+id/uesr_tv_staff_role"
+            style="@style/UserInfoTextView"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_5_x"
+            android:textColor="@color/red"
+            tools:text="军委主席"/>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:layout_marginTop="@dimen/dp_5_y"
+        android:background="#44000000"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_48_y"
+        android:layout_marginLeft="@dimen/dp_10_x"
+        android:layout_marginRight="@dimen/dp_10_x"
+        android:layout_marginTop="@dimen/dp_5_y">
+
+        <TextView
+            style="@style/UserInfoTextView"
+            android:text="地址"/>
+
+        <TextView
+            android:id="@+id/uesr_tv_staff_address"
+            style="@style/UserInfoTextView"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_5_x"
+            android:textColor="@color/red"
+            tools:text="山东潍坊"/>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:layout_marginTop="@dimen/dp_5_y"
+        android:background="#44000000"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_48_y"
+        android:layout_marginLeft="@dimen/dp_10_x"
+        android:layout_marginRight="@dimen/dp_10_x"
+        android:layout_marginTop="@dimen/dp_5_y">
+
+        <TextView
+            style="@style/UserInfoTextView"
+            android:text="手机号"/>
+
+        <TextView
+            android:id="@+id/uesr_tv_staff_phone"
+            style="@style/UserInfoTextView"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_5_x"
+            android:textColor="@color/red"
+            tools:text="12345678901"/>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:layout_marginTop="@dimen/dp_5_y"
+        android:background="#44000000"/>
+
+    <RelativeLayout
+        android:id="@+id/user_rl_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_48_y"
+        android:layout_marginLeft="@dimen/dp_10_x"
+        android:layout_marginRight="@dimen/dp_10_x"
+        android:layout_marginTop="@dimen/dp_5_y">
+
+        <TextView
+            style="@style/UserInfoTextView"
+            android:text="紧急报警电话"/>
+
+        <TextView
+            android:id="@+id/uesr_tv_urgent_phone"
+            style="@style/UserInfoTextView"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_5_x"
+            android:textColor="@color/red"
+            tools:text="12345678901"/>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:layout_marginTop="@dimen/dp_5_y"
+        android:background="#44000000"/>
+
+</LinearLayout>

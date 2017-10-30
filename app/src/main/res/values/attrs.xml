@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="SkipView">
+        <attr name="round_width" format="dimension"/>
+        <attr name="round_color" format="color"/>
+        <attr name="progress_color" format="color"/>
+        <attr name="max_progess" format="integer"/>
+        <attr name="current_progress" format="integer"/>
+        <attr name="text_color" format="color"/>
+        <attr name="text_size" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="CircleImageView">
+        <attr name="border_width" format="dimension"/>
+        <attr name="border_color" format="color"/>
+    </declare-styleable>
+
+</resources>

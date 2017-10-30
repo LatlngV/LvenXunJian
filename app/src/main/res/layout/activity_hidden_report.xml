@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#11000000">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/hidden_toolbar"
+        style="@style/ToolbarStyle"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/hidden_toolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/dp_10_y"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/dp_5_x"
+                    android:paddingRight="@dimen/dp_5_x"
+                    android:text="X："
+                    android:textColor="@color/red"
+                    android:textSize="18sp"/>
+
+                <Space
+                    android:layout_width="@dimen/dp_5_x"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/hidden_tv_longitude"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"/>
+
+                <Space
+                    android:layout_width="@dimen/dp_25_x"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/dp_5_x"
+                    android:paddingRight="@dimen/dp_5_x"
+                    android:text="Y："
+                    android:textColor="@color/red"
+                    android:textSize="18sp"/>
+
+                <Space
+                    android:layout_width="@dimen/dp_5_x"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/hidden_tv_latitude"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"/>
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/hidden_et_position_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10_x"
+                android:background="@drawable/alarm_text_view_bg"
+                android:cursorVisible="false"
+                android:gravity="left|top"
+                android:hint="请输入所在位置"
+                android:paddingBottom="@dimen/dp_3_y"
+                android:paddingLeft="@dimen/dp_5_x"
+                android:paddingTop="@dimen/dp_3_y"
+                android:textColor="@color/black"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_10_x"
+                android:layout_marginTop="@dimen/dp_5_y"
+                android:text="事件类型"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:id="@+id/hidden_tv_enent_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_10_x"
+                android:layout_marginRight="@dimen/dp_10_x"
+                android:layout_marginTop="@dimen/dp_10_y"
+                android:background="@drawable/alarm_text_view_bg"
+                android:padding="@dimen/dp_5_y"
+                android:textColor="@color/red"
+                android:textSize="20sp"
+                tools:text="设备损坏"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_10_x"
+                android:layout_marginTop="@dimen/dp_10_y"
+                android:text="事件级别"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:id="@+id/hidden_tv_enent_level"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_10_x"
+                android:layout_marginRight="@dimen/dp_10_x"
+                android:layout_marginTop="@dimen/dp_10_y"
+                android:background="@drawable/alarm_text_view_bg"
+                android:padding="@dimen/dp_5_y"
+                android:textColor="@color/red"
+                android:textSize="20sp"
+                tools:text="一级事故"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_10_x"
+                android:layout_marginTop="@dimen/dp_10_y"
+                android:text="事件说明"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+
+            <EditText
+                android:id="@+id/hidden_et_event_description"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_50_y"
+                android:layout_margin="@dimen/dp_10_x"
+                android:background="@drawable/alarm_text_view_bg"
+                android:cursorVisible="false"
+                android:gravity="left|top"
+                android:paddingLeft="@dimen/dp_3_x"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_10_x"
+                android:text="上传图片"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_10_y">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/hidden_iv_first_take_photo"
+                        android:layout_width="@dimen/dp_60_x"
+                        android:layout_height="@dimen/dp_60_y"
+                        android:background="@color/white"
+                        android:src="@drawable/add_camera"/>
+
+                    <Space
+                        android:layout_width="@dimen/dp_30_x"
+                        android:layout_height="wrap_content"/>
+
+                    <ImageView
+                        android:id="@+id/hidden_iv_secord_take_photo"
+                        android:layout_width="@dimen/dp_60_x"
+                        android:layout_height="@dimen/dp_60_y"
+                        android:background="@color/white"
+                        android:src="@drawable/add_camera"/>
+
+                    <Space
+                        android:layout_width="@dimen/dp_30_x"
+                        android:layout_height="wrap_content"/>
+
+                    <ImageView
+                        android:id="@+id/hidden_iv_third_take_photo"
+                        android:layout_width="@dimen/dp_60_x"
+                        android:layout_height="@dimen/dp_60_y"
+                        android:background="@color/white"
+                        android:src="@drawable/add_camera"/>
+
+                    <Space
+                        android:layout_width="@dimen/dp_30_x"
+                        android:layout_height="wrap_content"/>
+
+                    <ImageView
+                        android:id="@+id/hidden_iv_forth_take_photo"
+                        android:layout_width="@dimen/dp_60_x"
+                        android:layout_height="@dimen/dp_60_y"
+                        android:background="@color/white"
+                        android:src="@drawable/add_camera"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/hidden_btn_save"
+                android:layout_width="@dimen/dp_150_x"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/dp_10_y"
+                android:layout_marginTop="@dimen/dp_10_y"
+                android:text="保存"
+                android:textColor="@color/red"
+                android:textSize="20sp"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>
+

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="@dimen/dp_200_x"
+        android:layout_height="@dimen/dp_50_y"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/dp_20_x"
+        android:text="提示"
+        android:textColor="#FFFF0000"
+        android:textSize="25sp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1_y"
+        android:background="#88000000"/>
+
+    <TextView
+        android:layout_width="300dp"
+        android:layout_height="@dimen/dp_50_y"
+        android:gravity="center"
+        android:text="今天的任务还没有开始！"
+        android:textColor="@color/black"
+        android:textSize="25sp"/>
+
+</LinearLayout>

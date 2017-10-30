@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50_y"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/alarm_item_img"
+            android:layout_width="@dimen/dp_25_x"
+            android:layout_height="@dimen/dp_25_y"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/dp_10_x"
+            android:background="@drawable/data_collection1"/>
+
+        <TextView
+            android:id="@+id/alarm_item_tv_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/dp_15_x"
+            android:layout_weight="1"
+            android:textColor="#cc000000"
+            android:textSize="18sp"
+            tools:text="崭新"/>
+
+        <ImageView
+            android:layout_width="@dimen/dp_25_x"
+            android:layout_height="@dimen/dp_25_y"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/dp_10_x"
+            android:background="@drawable/arrow_right"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,22 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
+        // 使用"android-apt"插件，用于 ButterKnife
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        // Lambda 表达式
+        classpath 'me.tatarka:gradle-retrolambda:3.2.4'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
