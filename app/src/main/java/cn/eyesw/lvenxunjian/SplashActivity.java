@@ -1,6 +1,8 @@
 package cn.eyesw.lvenxunjian;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.view.Window;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -8,9 +10,19 @@ import android.view.animation.AnimationSet;
 import android.view.animation.ScaleAnimation;
 import android.widget.RelativeLayout;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import butterknife.BindView;
 import cn.eyesw.lvenxunjian.base.BaseActivity;
+import cn.eyesw.lvenxunjian.constant.Constant;
+import cn.eyesw.lvenxunjian.constant.NetworkApi;
+import cn.eyesw.lvenxunjian.utils.OkHttpManager;
 import cn.eyesw.lvenxunjian.utils.SpUtil;
+import okhttp3.Call;
 
 /**
  * 闪屏界面
@@ -36,6 +48,9 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void initView() {
         mSpUtil = SpUtil.getInstance(mContext);
+
+        // 检查版本更新
+        checkVersion();
 
         // 透明度动画
         AlphaAnimation alpha = new AlphaAnimation(0.3f, 1f);
@@ -77,14 +92,61 @@ public class SplashActivity extends BaseActivity {
         mRelativeLayout.startAnimation(set);
     }
 
+    private void checkVersion() {
+        Map<String, String> map = new HashMap<>();
+        map.put("staff_id", mSpUtil.getString("id"));
+        OkHttpManager.getInstance()
+                .postAsyncForm(NetworkApi.VERSION, map, new OkHttpManager.DataCallback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                showToast("网络连接失败");
+            }
+
+            @Override
+            public void onResponse(String json) {
+                try {
+                    JSONObject object = new JSONObject(json);
+                    int code = object.getInt("code");
+                    if (code == 200) {
+                        JSONObject data = object.getJSONObject("data");
+                        String version = data.getString("app_version");
+                        String appUrl = data.getString("app_download_url");
+                        if (!version.equals(getVersion())) {
+                            mSpUtil.putBoolean(Constant.VERSION_UPDATE, true);
+                            mSpUtil.putString(Constant.APK_URL, appUrl);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    /**
+     * 获取当前版本号
+     */
+    private String getVersion() throws Exception {
+        // 获取 PackageManager 的实例
+        PackageManager packageManager = getPackageManager();
+        // getPackageName() 是你当前类的包名，0 代表是获取版本信息
+        PackageInfo packInfo = packageManager.getPackageInfo(getPackageName(), 0);
+        return packInfo.versionName;
+    }
+
     /**
      * 跳转到另一个页面
      */
     private void jumpToNextPage() {
         // 如果之前登陆过就跳转到主界面，否则就跳转到登陆界面
         if (mSpUtil.getBoolean("isLogin")) {
-            Intent intent = new Intent(mContext, MainActivity.class);
-            startActivity(intent);
+            if (mSpUtil.getString("roleName").equals("巡检人员")) {
+                Intent intent = new Intent(mContext, MainActivity.class);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(mContext, HomeActivity.class);
+                startActivity(intent);
+            }
         } else {
             Intent intent = new Intent(mContext, LoginActivity.class);
             startActivity(intent);

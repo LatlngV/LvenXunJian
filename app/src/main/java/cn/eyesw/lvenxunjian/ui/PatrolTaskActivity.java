@@ -1,5 +1,6 @@
 package cn.eyesw.lvenxunjian.ui;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,6 +10,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
@@ -27,12 +29,13 @@ import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
-import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.PolylineOptions;
+import com.baidu.mapapi.map.TextureMapView;
+import com.baidu.mapapi.map.UiSettings;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.CoordinateConverter;
 
@@ -49,19 +52,21 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import cn.eyesw.greendao.LatlngEntityDao;
+import cn.eyesw.lvenxunjian.LvenXunJianApplication;
 import cn.eyesw.lvenxunjian.R;
 import cn.eyesw.lvenxunjian.base.BaseActivity;
-import cn.eyesw.lvenxunjian.bean.PipelinePointBean;
-import cn.eyesw.lvenxunjian.bean.StaffPointBean;
+import cn.eyesw.lvenxunjian.bean.LatlngEntity;
 import cn.eyesw.lvenxunjian.constant.Constant;
 import cn.eyesw.lvenxunjian.constant.NetworkApi;
 import cn.eyesw.lvenxunjian.service.UpdateClockService;
 import cn.eyesw.lvenxunjian.utils.DensityUtil;
 import cn.eyesw.lvenxunjian.utils.OkHttpManager;
-import cn.eyesw.lvenxunjian.utils.PipelinePointDao;
 import cn.eyesw.lvenxunjian.utils.SpUtil;
-import cn.eyesw.lvenxunjian.utils.StaffPointDao;
 import cn.eyesw.lvenxunjian.utils.ToolbarUtil;
+import me.weyye.hipermission.HiPermission;
+import me.weyye.hipermission.PermissionCallback;
+import me.weyye.hipermission.PermissionItem;
 import okhttp3.Call;
 
 /**
@@ -85,14 +90,12 @@ public class PatrolTaskActivity extends BaseActivity {
     private boolean mFlag = true;
     /* 百度地图 */
     private BaiduMap mBaiduMap;
-    private PipelinePointBean mPipelinePointBean;
+    private LocationClient mLocationClient = null;
     private LatLng mLatLng;
     private CoordinateConverter mConverter;
-    private StaffPointBean mStaffPointBean;
     private BitmapDescriptor mBitmapDescriptor;
-    // 是不是第一次定位
-    private boolean isFirstLoc = true;
-    private MyLocationListener mMyLocationListener = new MyLocationListener();
+    private LatlngEntityDao mLatlngEntityDao;
+    private LatlngEntity mLatlngEntity;
 
     @BindView(R.id.patrol_task_toolbar)
     protected Toolbar mToolbar;
@@ -106,8 +109,8 @@ public class PatrolTaskActivity extends BaseActivity {
     protected TextView mTvPositionComplete;
     @BindView(R.id.patrol_task_tv_total)
     protected TextView mTvPositionTotal;
-    @BindView(R.id.patrol_task_btn_map_view)
-    protected MapView mMapView;
+    @BindView(R.id.patrol_task_texture_map_view)
+    protected TextureMapView mTextureMapView;
     @BindView(R.id.patrol_task_tv_timer)
     protected TextView mTvTimer;
 
@@ -136,18 +139,58 @@ public class PatrolTaskActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        mLatlngEntityDao = LvenXunJianApplication.getDaoSession().getLatlngEntityDao();
         mSpUtil = SpUtil.getInstance(mContext);
         mOkHttpManager = OkHttpManager.getInstance();
 
         // 初始化百度地图
-        mBaiduMap = mMapView.getMap();
-        // s设置百度地图模式: 卫星模式
-        mBaiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);
-        // 开启定位图层
-        mBaiduMap.setMyLocationEnabled(true);
+        mBaiduMap = mTextureMapView.getMap();
+        // 设置百度地图模式: 卫星模式
+        mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
+        // 设置地图不旋转
+        UiSettings uiSettings = mBaiduMap.getUiSettings();
+        uiSettings.setRotateGesturesEnabled(false);
+        // 坐标转换
+        mConverter = new CoordinateConverter();
+        mConverter.from(CoordinateConverter.CoordType.COMMON);
+
+        List<PermissionItem> permissions = new ArrayList<>();
+        permissions.add(new PermissionItem(Manifest.permission.ACCESS_FINE_LOCATION, "精确位置", R.drawable.permission_ic_location));
+        HiPermission.create(this)
+                .title("授权")
+                .permissions(permissions)
+                .animStyle(R.style.PermissionAnimModal)
+                .filterColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()))
+                .msg("开启权限")
+                .checkMutiPermission(new PermissionCallback() {
+                    @Override
+                    public void onClose() {
+                        showToast("定位授权关闭");
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        // 多个授权的时候 6.0 以下走此方法
+                        baiduLocation();
+                    }
+
+                    @Override
+                    public void onDeny(String permission, int position) {
+                    }
+
+                    @Override
+                    public void onGuarantee(String permission, int position) {
+                        // 授权定位
+                        baiduLocation();
+                    }
+                });
+    }
+
+    private void baiduLocation() {
+        MyLocationListener myLocationListener = new MyLocationListener();
         // 定位初始化
-        LocationClient mLocClient = new LocationClient(this);
-        mLocClient.registerLocationListener(mMyLocationListener);
+        mLocationClient = new LocationClient(getApplicationContext());
+        mLocationClient.registerLocationListener(myLocationListener);
         LocationClientOption option = new LocationClientOption();
         // 打开 gps
         option.setOpenGps(true);
@@ -155,11 +198,10 @@ public class PatrolTaskActivity extends BaseActivity {
         option.setCoorType("bd09ll");
         // 定位的频率
         option.setScanSpan(1000 * 20);
-        mLocClient.setLocOption(option);
-        mLocClient.start();
-        // 坐标转换
-        mConverter = new CoordinateConverter();
-        mConverter.from(CoordinateConverter.CoordType.COMMON);
+        mLocationClient.setLocOption(option);
+        mLocationClient.start();
+        // 开启定位图层
+        mBaiduMap.setMyLocationEnabled(true);
     }
 
     @Override
@@ -172,13 +214,13 @@ public class PatrolTaskActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mMapView.onResume();
+        mTextureMapView.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mMapView.onPause();
+        mTextureMapView.onPause();
         mHandler.removeCallbacksAndMessages(null);
         // 解注册
         if (mTimeReceiver != null) {
@@ -193,10 +235,13 @@ public class PatrolTaskActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        // 当不需要定位图层时关闭定位图层
-        mBaiduMap.setMyLocationEnabled(false);
-        mMapView.onDestroy();
-        mMapView = null;
+        if (mLocationClient != null && mLocationClient.isStarted()) {
+            mLocationClient.stop();
+            // 当不需要定位图层时关闭定位图层
+            mBaiduMap.setMyLocationEnabled(false);
+        }
+        mTextureMapView.onDestroy();
+        mTextureMapView = null;
         super.onDestroy();
     }
 
@@ -283,17 +328,18 @@ public class PatrolTaskActivity extends BaseActivity {
      * 画管线
      */
     private void drawPipeline() {
-        PipelinePointDao pipelinePointDao = new PipelinePointDao(getApplicationContext());
-        List<PipelinePointBean> select = pipelinePointDao.select();
+        List<LatlngEntity> select = mLatlngEntityDao.queryBuilder()
+                .where(LatlngEntityDao.Properties.Flag.eq("pipeline"))
+                .list();
 
         if (select.size() > 0) { // 集合的长度大于 0，从数据库中读取数据，画出来
             // 先清空百度地图原来画的
             mBaiduMap.clear();
             List<LatLng> points = new ArrayList<>();
             for (int i = 0, length = select.size(); i < length; i++) {
-                mPipelinePointBean = select.get(i);
-                double latitude = mPipelinePointBean.getLatitude();
-                double longitude = mPipelinePointBean.getLongitude();
+                mLatlngEntity = select.get(i);
+                double latitude = mLatlngEntity.getLatitude();
+                double longitude = mLatlngEntity.getLongitude();
                 mLatLng = new LatLng(latitude, longitude);
                 points.add(mLatLng);
             }
@@ -313,8 +359,9 @@ public class PatrolTaskActivity extends BaseActivity {
      * 根据状态画巡线员必经点
      */
     private void drawStaffPoint() {
-        StaffPointDao staffPointDao = new StaffPointDao(getApplicationContext());
-        List<StaffPointBean> select = staffPointDao.select();
+        List<LatlngEntity> select = mLatlngEntityDao.queryBuilder()
+                .where(LatlngEntityDao.Properties.Flag.eq("staffPoint"))
+                .list();
 
         if (select.size() > 0) {
             //创建 OverlayOptions 的集合
@@ -323,9 +370,9 @@ public class PatrolTaskActivity extends BaseActivity {
             double longitude;
             for (int i = 0, length = select.size(); i < length; i++) {
                 String status = mStatus.get(i);
-                StaffPointBean staffPointBean = select.get(i);
-                latitude = staffPointBean.getLatitude();
-                longitude = staffPointBean.getLongitude();
+                mLatlngEntity = select.get(i);
+                latitude = mLatlngEntity.getLatitude();
+                longitude = mLatlngEntity.getLongitude();
                 mLatLng = new LatLng(latitude, longitude);
                 if (status.equals("1")) {
                     mBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.route_green);
@@ -368,19 +415,20 @@ public class PatrolTaskActivity extends BaseActivity {
                         JSONArray jsonArray = jsonObject.getJSONArray("positions");
                         jsonArray = ((JSONObject) jsonArray.get(0)).getJSONArray("positions");
                         List<LatLng> pointList = new ArrayList<>();
-                        PipelinePointDao pipelinePointDao = new PipelinePointDao(getApplicationContext());
+                        double latitude;
+                        double longitude;
                         for (int i = 0, length = jsonArray.length(); i < length; i++) {
                             JSONObject data = (JSONObject) jsonArray.get(i);
-                            double latitude = Double.parseDouble(data.getString("latitude"));
-                            double longitude = Double.parseDouble(data.getString("longitude"));
+                            latitude = Double.parseDouble(data.getString("latitude"));
+                            longitude = Double.parseDouble(data.getString("longitude"));
                             mLatLng = new LatLng(latitude, longitude);
                             pointList.add(mLatLng);
 
                             // LatLng 待转换坐标
                             mConverter.coord(mLatLng);
                             LatLng latLng = mConverter.convert();
-                            mPipelinePointBean = new PipelinePointBean(latLng.latitude, latLng.longitude);
-                            pipelinePointDao.add(mPipelinePointBean);
+                            mLatlngEntity = new LatlngEntity(latLng.latitude, latLng.longitude, "pipeline");
+                            mLatlngEntityDao.insert(mLatlngEntity);
                         }
                         //绘制折线
                         OverlayOptions ooPolyline = new PolylineOptions().width(10).color(0xAA0000FF).points(pointList);
@@ -417,7 +465,6 @@ public class PatrolTaskActivity extends BaseActivity {
                         JSONArray jsonArray = jsonObject.getJSONArray("kaoqin_positions");
                         jsonArray = ((JSONObject) jsonArray.get(0)).getJSONArray("kaoqin_positions");
                         List<OverlayOptions> options = new ArrayList<>();
-                        StaffPointDao staffPointDao = new StaffPointDao(getApplicationContext());
                         double latitude;
                         double longitude;
                         for (int i = 0, length = jsonArray.length(); i < length; i++) {
@@ -441,8 +488,8 @@ public class PatrolTaskActivity extends BaseActivity {
                             // 将必经点保存到数据库中
                             mConverter.coord(mLatLng);
                             LatLng latLng = mConverter.convert();
-                            mStaffPointBean = new StaffPointBean(latLng.latitude, latLng.longitude);
-                            staffPointDao.add(mStaffPointBean);
+                            mLatlngEntity = new LatlngEntity(latLng.latitude, latLng.longitude, "staffPoint");
+                            mLatlngEntityDao.insert(mLatlngEntity);
                         }
                         mBaiduMap.addOverlays(options);
 
@@ -660,7 +707,7 @@ public class PatrolTaskActivity extends BaseActivity {
 
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
-            if (bdLocation == null || mMapView == null) {
+            if (bdLocation == null || mTextureMapView == null) {
                 return;
             }
             double latitude = bdLocation.getLatitude();
@@ -668,7 +715,7 @@ public class PatrolTaskActivity extends BaseActivity {
 
             MyLocationData myLocationData = new MyLocationData.Builder()
                     .accuracy(bdLocation.getRadius())
-                    .direction(100)
+                    .direction(0)
                     .latitude(latitude)
                     .longitude(longitude)
                     .build();
@@ -677,13 +724,10 @@ public class PatrolTaskActivity extends BaseActivity {
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.marker);
             MyLocationConfiguration myLocationConfiguration = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, bitmapDescriptor);
             mBaiduMap.setMyLocationConfiguration(myLocationConfiguration);
-            if (isFirstLoc) {
-                isFirstLoc = false;
-                LatLng ll = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
-                MapStatus.Builder builder = new MapStatus.Builder();
-                builder.target(ll).zoom(18.0f);
-                mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
-            }
+            LatLng ll = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
+            MapStatus.Builder builder = new MapStatus.Builder();
+            builder.target(ll).zoom(18.0f);
+            mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
         }
     }
 

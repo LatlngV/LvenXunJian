@@ -1,5 +1,6 @@
 package cn.eyesw.lvenxunjian;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -18,6 +19,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,8 +29,8 @@ import butterknife.OnTextChanged;
 import cn.eyesw.lvenxunjian.base.BaseActivity;
 import cn.eyesw.lvenxunjian.constant.NetworkApi;
 import cn.eyesw.lvenxunjian.utils.DialogUtil;
-import cn.eyesw.lvenxunjian.utils.PermissionsUtil;
 import cn.eyesw.lvenxunjian.utils.SpUtil;
+import me.weyye.hipermission.PermissionItem;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -130,7 +133,7 @@ public class LoginActivity extends BaseActivity {
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 runOnUiThread(() -> {
                     Toast.makeText(mContext, "网络连接失败", Toast.LENGTH_SHORT).show();
                     mProgressDialog.dismiss();
@@ -138,7 +141,7 @@ public class LoginActivity extends BaseActivity {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 // 上传数据成功后返回的 json 数据
                 String json = response.body().string();
                 progressLoginData(json);
@@ -171,8 +174,14 @@ public class LoginActivity extends BaseActivity {
                 spUtil.putString("password", mPassword);
                 spUtil.putBoolean("isLogin", true);
 
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                Intent intent;
+                if (roleName.equals("巡检人员")) {
+                    intent = new Intent(LoginActivity.this, MainActivity.class);
+                } else {
+                    intent = new Intent(LoginActivity.this, HomeActivity.class);
+                }
                 startActivity(intent);
+                mProgressDialog.dismiss();
                 finish();
 
             } else if (code == 400) {
@@ -198,16 +207,11 @@ public class LoginActivity extends BaseActivity {
         tvPhoneNumber.setText(mPhone);
 
         tvPhoneNumber.setOnClickListener(v -> {
-            PermissionsUtil.requestPermission(LoginActivity.this, PermissionsUtil.CODE_CALL_PHONE, mPermissionGrant);
-            dialog.dismiss();
+            List<PermissionItem> permissions = new ArrayList<>();
+            permissions.add(new PermissionItem(Manifest.permission.CALL_PHONE, "打电话", R.drawable.permission_ic_phone));
+            permission(permissions, this::callToContacts);
         });
     }
-
-    private PermissionsUtil.PermissionGrant mPermissionGrant = requestCode -> {
-        if (requestCode == PermissionsUtil.CODE_CALL_PHONE) {
-            callToContacts();
-        }
-    };
 
     /**
      * 拨打紧急联系人电话
@@ -229,22 +233,6 @@ public class LoginActivity extends BaseActivity {
             }
         }
         return false;
-    }
-
-    /**
-     * 请求权限的回调
-     *
-     * @param requestCode  requestCode --> 是 requestPermissions() 方法传递过来的请求码。
-     * @param permissions  permissions --> 是 requestPermissions() 方法传递过来的需要申请权限
-     * @param grantResults grantResults --> 是申请权限后，系统返回的结果
-     *                     PackageManager.PERMISSION_GRANTED表示授权成功，
-     *                     PackageManager.PERMISSION_DENIED表示授权失败。
-     *                     grantResults 和 permissions是一一对应的
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        PermissionsUtil.requestPermissionsResult(this, requestCode, permissions, grantResults, mPermissionGrant);
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
 }

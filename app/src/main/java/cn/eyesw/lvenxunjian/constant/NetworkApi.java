@@ -6,7 +6,8 @@ package cn.eyesw.lvenxunjian.constant;
 public class NetworkApi {
 
     // 中世 base_url
-    private static final String BASE_URI = "http://121.42.136.94/admin/api";
+    public static final String BASE_URI = "http://121.42.136.94/admin/api";
+    public static final String BASE_URI_ZS = "http://121.42.136.94/admin/api/";
     // 登陆
     public static final String LOGIN = BASE_URI + "/login";
 

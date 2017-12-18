@@ -3,8 +3,11 @@
 
     <paths>
         <external-path
-            name="download"
-            path=""/>
+            name="image"
+            path="Pictures"/>
+        <external-path
+            name="apk"
+            path="Download"/>
     </paths>
 
 </resources>

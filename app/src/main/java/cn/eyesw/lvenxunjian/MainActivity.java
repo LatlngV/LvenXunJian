@@ -2,8 +2,6 @@ package cn.eyesw.lvenxunjian;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -31,12 +29,16 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.eyesw.greendao.LatlngEntityDao;
 import cn.eyesw.lvenxunjian.base.BaseActivity;
+import cn.eyesw.lvenxunjian.bean.LatlngEntity;
+import cn.eyesw.lvenxunjian.constant.Constant;
 import cn.eyesw.lvenxunjian.constant.NetworkApi;
 import cn.eyesw.lvenxunjian.ui.EmergencyAlarmActivity;
 import cn.eyesw.lvenxunjian.ui.HiddenReportActivity;
@@ -63,7 +65,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private long startTime;
     private OkHttpManager mOkHttpManager;
     private SpUtil mSpUtil;
-    private String mAppUrl;
 
     @BindView(R.id.main_drawer_layout)
     protected DrawerLayout mDrawerLayout;
@@ -101,8 +102,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mOkHttpManager = OkHttpManager.getInstance();
 
         // 检测版本号
-        checkVersion();
-
+        boolean versionUpdate = mSpUtil.getBoolean(Constant.VERSION_UPDATE);
+        if (versionUpdate) {
+            showUpdateDialog();
+        }
         // 监测是否填写了紧急联系人
         checkEmergencyContacts();
 
@@ -184,39 +187,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     /**
-     * 检测版本号
-     */
-    private void checkVersion() {
-        Map<String, String> map = new HashMap<>();
-        map.put("staff_id", mSpUtil.getString("id"));
-        mOkHttpManager.postAsyncForm(NetworkApi.VERSION, map, new OkHttpManager.DataCallback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                showToast("网络连接失败");
-            }
-
-            @Override
-            public void onResponse(String json) {
-                try {
-                    JSONObject object = new JSONObject(json);
-                    int code = object.getInt("code");
-                    if (code == 200) {
-                        JSONObject data = object.getJSONObject("data");
-                        String version = data.getString("app_version");
-                        mAppUrl = data.getString("app_download_url");
-                        if (!version.equals(getVersion())) {
-                            // 显示提示更新的对话框
-                            showUpdateDialog();
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    /**
      * 提示更新的对话框
      */
     private void showUpdateDialog() {
@@ -224,6 +194,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         dialog.setTitle("版本升级");
         dialog.setMessage("有新版本，是否升级？");
         dialog.setPositiveButton("确定", (dialogInterface, i) -> {
+            mSpUtil.putBoolean(Constant.VERSION_UPDATE, false);
             PermissionsUtil.requestPermission(this, PermissionsUtil.CODE_WRITE_EXTERNAL_STORAGE, mPermissionGrant);
         });
         dialog.setNegativeButton("取消", null);
@@ -232,21 +203,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private PermissionsUtil.PermissionGrant mPermissionGrant = requestCode -> {
         if (requestCode == PermissionsUtil.CODE_WRITE_EXTERNAL_STORAGE) {
-            UpdateManager updateManager = new UpdateManager(this, mAppUrl);
+            String apkUrl = mSpUtil.getString(Constant.APK_URL);
+            UpdateManager updateManager = new UpdateManager(this, apkUrl);
             updateManager.checkUpdateInfo();
         }
     };
-
-    /**
-     * 获取当前版本号
-     */
-    private String getVersion() throws Exception {
-        // 获取 PackageManager 的实例
-        PackageManager packageManager = getPackageManager();
-        // getPackageName() 是你当前类的包名，0 代表是获取版本信息
-        PackageInfo packInfo = packageManager.getPackageInfo(getPackageName(), 0);
-        return packInfo.versionName;
-    }
 
     /**
      * 初始化 DrawerLayout
@@ -331,8 +292,19 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         switch (item.getItemId()) {
             case R.id.menu_navigation_view_switch_uesr:
                 Intent intent = new Intent(mContext, LoginActivity.class);
-                SpUtil.getInstance(mContext).putBoolean("isLogin", false);
-                SpUtil.getInstance(mContext).putString("phone", "");
+                mSpUtil.putBoolean("isLogin", false);
+                mSpUtil.putString("phone", "");
+                mSpUtil.remove(Constant.VERSION_UPDATE);
+                mSpUtil.remove(Constant.APK_URL);
+
+                // 退出登录清空数据库
+                LatlngEntityDao latlngEntityDao = LvenXunJianApplication.getDaoSession().getLatlngEntityDao();
+                if (latlngEntityDao != null) {
+                    List<LatlngEntity> list = latlngEntityDao.loadAll();
+                    if (list.size() > 0) {
+                        latlngEntityDao.deleteAll();
+                    }
+                }
                 startActivity(intent);
                 finish();
                 break;

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#eeeeee"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/danger_data_toolbar"
+        style="@style/ToolbarStyle"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="X : "
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:id="@+id/danger_data_tv_latitude"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="Y : "
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:id="@+id/danger_data_tv_longitude"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/danger_data_tv_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="3dp"
+        android:background="@drawable/login_edit_text_bg"
+        android:padding="5dp"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        tools:text="山东潍坊"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="@dimen/dp_5_y"
+        android:text="维修前照片"
+        android:textColor="@color/black"
+        android:textSize="20sp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp_20_x"
+        android:layout_marginRight="@dimen/dp_20_x"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dp_60_y"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/danger_data_before_first"
+            android:layout_width="@dimen/dp_60_x"
+            android:layout_height="@dimen/dp_60_y"
+            android:background="@drawable/add_camera"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dp_60_y"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/danger_data_before_second"
+            android:layout_width="@dimen/dp_60_x"
+            android:layout_height="@dimen/dp_60_y"
+            android:background="@drawable/add_camera"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dp_60_y"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/danger_data_before_third"
+            android:layout_width="@dimen/dp_60_x"
+            android:layout_height="@dimen/dp_60_y"
+            android:background="@drawable/add_camera"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dp_60_y"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/danger_data_before_forth"
+            android:layout_width="@dimen/dp_60_x"
+            android:layout_height="@dimen/dp_60_y"
+            android:background="@drawable/add_camera"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dp_60_y"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="@dimen/dp_5_y"
+        android:text="维修后照片"
+        android:textColor="@color/black"
+        android:textSize="20sp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp_20_x"
+        android:layout_marginRight="@dimen/dp_20_x"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dp_60_y"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/danger_data_after_first"
+            android:layout_width="@dimen/dp_60_x"
+            android:layout_height="@dimen/dp_60_y"
+            android:background="@drawable/add_camera"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dp_60_y"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/danger_data_after_second"
+            android:layout_width="@dimen/dp_60_x"
+            android:layout_height="@dimen/dp_60_y"
+            android:background="@drawable/add_camera"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dp_60_y"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/danger_data_after_third"
+            android:layout_width="@dimen/dp_60_x"
+            android:layout_height="@dimen/dp_60_y"
+            android:background="@drawable/add_camera"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dp_60_y"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/danger_data_after_forth"
+            android:layout_width="@dimen/dp_60_x"
+            android:layout_height="@dimen/dp_60_y"
+            android:background="@drawable/add_camera"
+            android:scaleType="fitXY"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dp_60_y"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <Switch
+        android:id="@+id/danger_data_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:padding="20dp"
+        android:text="维修状态"
+        android:textOff="完成"
+        android:textOn="进行中"
+        android:textSize="20sp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp_20_x"
+        android:layout_marginTop="@dimen/dp_5_y"
+        android:text="情况说明"
+        android:textColor="@color/black"
+        android:textSize="20sp"/>
+
+    <EditText
+        android:id="@+id/danger_data_et_detail"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_75_y"
+        android:layout_marginLeft="@dimen/dp_20_x"
+        android:layout_marginRight="@dimen/dp_20_x"
+        android:layout_marginTop="@dimen/dp_5_x"
+        android:background="@drawable/login_edit_text_bg"
+        android:gravity="top|left"
+        android:inputType="text"
+        android:minHeight="@dimen/dp_50_y"
+        android:padding="5dp"
+        android:textColor="@color/black"
+        tools:ignore="LabelFor"/>
+
+    <Button
+        android:id="@+id/danger_data_btn_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/dp_5_y"
+        android:text="保存"/>
+
+</LinearLayout>

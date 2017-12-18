@@ -2,11 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="cn.eyesw.lvenxunjian">
 
-    <!-- 打电话权限(API23 以后还要重写一些方法) -->
+    <!-- 打电话权限 -->
     <uses-permission android:name="android.permission.CALL_PHONE"/>
-    <!-- 读取和写入到内存卡中 -->
+    <!-- 读取内存卡 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <!-- 相机权限 -->
     <uses-permission android:name="android.permission.CAMERA"/>
     <!-- 网络状态 -->
@@ -25,8 +24,22 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
     <!-- 获取统计数据 -->
     <uses-permission android:name="android.permission.GET_TASKS"/>
-    <!-- 鉴权所需该权限获取进程列表 -->
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- 这个权限用于进行网络定位 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!-- 这个权限用于访问GPS定位 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <!-- 用于访问wifi网络信息，wifi信息会用于进行网络定位 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <!-- 获取运营商信息，用于支持提供运营商信息相关的接口 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- 这个权限用于获取wifi的获取权限，wifi信息会用来进行网络定位 -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <!-- 用于读取手机当前的状态 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <!-- 写入扩展存储，向扩展卡写入数据，用于写入离线定位数据 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!-- SD卡读取权限，用户写入离线定位数据 -->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
 
     <application
         android:name=".LvenXunJianApplication"
@@ -40,7 +53,7 @@
         <!-- ********** 百度定图配置 START ********** -->
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="QW1Aer1I2s72GbBgitrSXH6qWUjaEkT4"/>
+            android:value="XRozeyMVBoC0AnrrvzIvos7FZt76C9EX"/>
 
         <service
             android:name="com.baidu.location.f"
@@ -103,8 +116,34 @@
         <activity
             android:name=".ui.MyMessageActivity"
             android:screenOrientation="portrait"/>
+
+        <!-- 管理员界面 -->
         <activity
-            android:name=".ui.BaiduActivity"
+            android:name=".HomeActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.DataCollectionActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.DangerMapActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.RepairManagerActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.DangerDataActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.UrgentRepairActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.InspectionActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.LargeImageActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.InspectionDataActivity"
             android:screenOrientation="portrait"/>
 
         <receiver android:name=".receiver.NetWorkReceiver">

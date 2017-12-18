@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.eyesw.lvenxunjian.bean.PipelinePointBean;
-import cn.eyesw.lvenxunjian.bean.StaffPointBean;
 import cn.eyesw.lvenxunjian.constant.Constant;
 import cn.eyesw.lvenxunjian.database.DBHelper;
 

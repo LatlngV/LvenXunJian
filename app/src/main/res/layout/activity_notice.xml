@@ -87,6 +87,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:text="提交"
+        android:enabled="false"
         android:background="@drawable/btn_commit"
         android:textColor="#00ee76"
         android:textSize="20sp"/>

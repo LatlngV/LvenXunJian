@@ -1,5 +1,6 @@
 package cn.eyesw.lvenxunjian.ui;
 
+import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -9,9 +10,11 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,8 +26,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -39,6 +44,9 @@ import cn.eyesw.lvenxunjian.utils.OkHttpManager;
 import cn.eyesw.lvenxunjian.utils.PictureDao;
 import cn.eyesw.lvenxunjian.utils.SpUtil;
 import cn.eyesw.lvenxunjian.utils.ToolbarUtil;
+import me.weyye.hipermission.HiPermission;
+import me.weyye.hipermission.PermissionCallback;
+import me.weyye.hipermission.PermissionItem;
 import okhttp3.Call;
 
 /**
@@ -65,6 +73,8 @@ public class PatrolUploadActivity extends BaseActivity {
     protected TextView mTvDate;
     @BindView(R.id.upload_image_view)
     protected ImageView mImageView;
+    @BindView(R.id.upload_btn_commit)
+    protected Button mBtnCommit;
 
     @Override
     protected int getContentLayoutRes() {
@@ -87,7 +97,7 @@ public class PatrolUploadActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
         // 获取经纬度坐标
-        getLatlag();
+        getLatlng();
     }
 
     @OnClick({R.id.upload_tv_refresh, R.id.upload_image_view, R.id.upload_btn_commit})
@@ -95,11 +105,39 @@ public class PatrolUploadActivity extends BaseActivity {
         switch (view.getId()) {
             case R.id.upload_tv_refresh:
                 // 获取经纬度坐标
-                getLatlag();
+                getLatlng();
                 break;
             case R.id.upload_image_view:
-                // 打开相机拍照
-                openCamera();
+                List<PermissionItem> permissions = new ArrayList<>();
+                permissions.add(new PermissionItem(Manifest.permission.CAMERA, "相机授权", R.drawable.permission_ic_camera));
+                HiPermission.create(this)
+                        .title("授权")
+                        .permissions(permissions)
+                        .animStyle(R.style.PermissionAnimModal)
+                        .filterColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()))
+                        .msg("开启权限")
+                        .checkMutiPermission(new PermissionCallback() {
+                            @Override
+                            public void onClose() {
+                                showToast("相机授权关闭");
+                            }
+
+                            @Override
+                            public void onFinish() {
+                                // 打开相机拍照
+                                openCamera();
+                            }
+
+                            @Override
+                            public void onDeny(String permission, int position) {
+                            }
+
+                            @Override
+                            public void onGuarantee(String permission, int position) {
+                                // 打开相机拍照
+                                openCamera();
+                            }
+                        });
                 break;
             case R.id.upload_btn_commit:
                 // 上传照片
@@ -184,13 +222,14 @@ public class PatrolUploadActivity extends BaseActivity {
                 Toast.makeText(mContext, "上传成功", Toast.LENGTH_SHORT).show();
             }
         });
-        mImageView.setImageResource(R.drawable.add_camera);
+        mBtnCommit.setEnabled(false);
+        mImageView.setImageResource(R.drawable.timg);
     }
 
     /**
      * 获取经纬度坐标
      */
-    private void getLatlag() {
+    private void getLatlng() {
         Map<String, String> map = new HashMap<>();
         map.put("staff_id", mSpUtil.getString("id"));
         mOkHttpManager.postAsyncForm(NetworkApi.GPS, map, new OkHttpManager.DataCallback() {
@@ -279,6 +318,7 @@ public class PatrolUploadActivity extends BaseActivity {
                 }
             }
             mImageView.setImageBitmap(mBitmap);
+            mBtnCommit.setEnabled(true);
         }
     }
 

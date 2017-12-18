@@ -7,91 +7,85 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * 日志工具类
+ * 日志工具类，采用构建者模式
  */
 public class LogUtil {
 
-    /**
-     * 控制全局 Log 的总开关
-     * 如果为 True，输出 Log
-     * 如果为 False，关闭 Log
-     */
-    private static boolean sLogSwitch = true;
-    private static String sTag = "ApplicationLog";
+    private boolean mSwitch;
+    private String mTag;
 
-    public static void setSwitch(boolean logSwitch) {
-        sLogSwitch = logSwitch;
+    public LogUtil() {
+
     }
 
-    public static void setTag(String tag) {
-        sTag = tag;
-    }
-
-    public static void error(String msg) {
-        if (sLogSwitch) {
-            Log.d(sTag, "error: == " + msg);
-        }
-    }
-
-    public static void error(String tag, String msg) {
-        if (sLogSwitch) {
-            Log.d(tag, "error: == " + msg);
-        }
-    }
-
-    public static void warn(String msg) {
-        if (sLogSwitch) {
-            Log.w(sTag, "warn: == " + msg);
-        }
-    }
-
-    public static void warn(String tag, String msg) {
-        if (sLogSwitch) {
-            Log.w(tag, "warn: == " + msg);
-        }
-    }
-
-    public static void debug(String msg) {
-        if (sLogSwitch) {
-            Log.d(sTag, "debug: == " + msg);
-        }
-    }
-
-    public static void debug(String tag, String msg) {
-        if (sLogSwitch) {
-            Log.d(tag, "debug: == " + msg);
-        }
-    }
-
-    public static void json(String json) {
-        if (sLogSwitch) {
-            Log.d(sTag, "json: == " + formatJSON(json));
-        }
-    }
-
-    public static void json(String tag, String json) {
-        if (sLogSwitch) {
-            Log.d(tag, "json: == " + formatJSON(json));
-        }
+    public LogUtil(Builder builder) {
+        mSwitch = builder.mLogSwitch;
+        mTag = builder.mLogTag;
     }
 
     /**
-     * 格式化 json 字符串
+     * 设置 log 的开关
      *
-     * @param json 需要格式化的 json 字符串
-     * @return 返回格式化的 json 字符串
+     * @param aSwitch 开关，true 表示开关打开， false 表示开关关闭
      */
-    private static String formatJSON(String json) {
-        try {
-            if (json.startsWith("{")) {
-                json = new JSONObject(json).toString(4);
-            } else if (json.startsWith("[")) {
-                json = new JSONArray(json).toString(4);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public void setSwitch(boolean aSwitch) {
+        mSwitch = aSwitch;
+    }
+
+    /**
+     * 设置 TAG
+     *
+     * @param tag 设置 log 的标签
+     */
+    public void setTag(String tag) {
+        mTag = tag;
+    }
+
+    public void debug(CharSequence msg) {
+        if (mSwitch) {
+            Log.d(mTag, "debug: " + msg);
         }
-        return json;
+    }
+
+    public void debug(String tag, CharSequence msg) {
+        if (mSwitch) {
+            Log.d(tag, "debug: " + msg);
+        }
+    }
+
+    public void error(CharSequence msg) {
+        if (mSwitch) {
+            Log.d(mTag, "error: " + msg);
+        }
+    }
+
+    public void error(String tag, CharSequence msg) {
+        if (mSwitch) {
+            Log.d(tag, "error: " + msg);
+        }
+    }
+
+    public static class Builder {
+
+        // 控制 Log 的开关，全局管用
+        private boolean mLogSwitch;
+        // 控制全局的 Tag
+        private String mLogTag;
+
+        public Builder setLogSwitch(boolean logSwitch) {
+            mLogSwitch = logSwitch;
+            return this;
+        }
+
+        public Builder setLogTag(String logTag) {
+            mLogTag = logTag;
+            return this;
+        }
+
+        public LogUtil build() {
+            return new LogUtil(this);
+        }
+
     }
 
 }

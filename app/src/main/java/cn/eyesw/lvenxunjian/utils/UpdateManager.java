@@ -67,10 +67,10 @@ public class UpdateManager {
 
     private void showDownloadDialog() {
         Builder builder = new Builder(mContext);
-        builder.setTitle("软件版本更新");
+        builder.setTitle("版本更新");
 
         View v = View.inflate(mContext, R.layout.progress, null);
-        mProgress = (ProgressBar) v.findViewById(R.id.progress);
+        mProgress = v.findViewById(R.id.progress);
 
         builder.setView(v);
         builder.setNegativeButton("取消", (dialog, which) -> {
@@ -78,6 +78,7 @@ public class UpdateManager {
             interceptFlag = true;
         });
         Dialog downloadDialog = builder.create();
+        downloadDialog.setCancelable(false);
         downloadDialog.show();
 
         downloadApk();

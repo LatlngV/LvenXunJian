@@ -1,0 +1,23 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ListView
+        android:id="@+id/update_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:dividerHeight="@dimen/dp_1_y"
+        android:scrollbars="none"/>
+
+    <TextView
+        android:id="@+id/update_tv_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="暂时没有数据"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:visibility="gone"/>
+
+</FrameLayout>

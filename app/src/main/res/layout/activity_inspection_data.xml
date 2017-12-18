@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/inspection_data_toolbar"
+            style="@style/ToolbarStyle"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="X : "
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:id="@+id/inspection_data_tv_latitude"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="Y : "
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:id="@+id/inspection_data_tv_longitude"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/inspection_data_tv_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="3dp"
+            android:background="@drawable/login_edit_text_bg"
+            android:padding="5dp"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            tools:text="山东潍坊"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="@dimen/dp_5_y"
+            android:text="拍照"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_20_x"
+            android:layout_marginRight="@dimen/dp_20_x"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="@dimen/dp_60_y"
+                android:layout_weight="1"/>
+
+            <ImageView
+                android:id="@+id/inspection_data_before_first"
+                android:layout_width="@dimen/dp_60_x"
+                android:layout_height="@dimen/dp_60_y"
+                android:background="@drawable/add_camera"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="@dimen/dp_60_y"
+                android:layout_weight="1"/>
+
+            <ImageView
+                android:id="@+id/inspection_data_before_second"
+                android:layout_width="@dimen/dp_60_x"
+                android:layout_height="@dimen/dp_60_y"
+                android:background="@drawable/add_camera"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="@dimen/dp_60_y"
+                android:layout_weight="1"/>
+
+            <ImageView
+                android:id="@+id/inspection_data_before_third"
+                android:layout_width="@dimen/dp_60_x"
+                android:layout_height="@dimen/dp_60_y"
+                android:background="@drawable/add_camera"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="@dimen/dp_60_y"
+                android:layout_weight="1"/>
+
+            <ImageView
+                android:id="@+id/inspection_data_before_forth"
+                android:layout_width="@dimen/dp_60_x"
+                android:layout_height="@dimen/dp_60_y"
+                android:background="@drawable/add_camera"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="@dimen/dp_60_y"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="@dimen/dp_5_y"
+            android:text="设备描述状态"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+
+        <RadioGroup
+            android:id="@+id/inspection_data_radio_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/inspection_data_rb_normal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="正常"/>
+
+            <RadioButton
+                android:id="@+id/inspection_data_rb_repair"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_5_x"
+                android:text="建议维修"/>
+
+            <RadioButton
+                android:id="@+id/inspection_data_rb_update"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_5_x"
+                android:text="建议更换"/>
+
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            android:paddingLeft="20dp"
+            android:paddingTop="5dp"
+            android:text="埋深数据"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+
+        <EditText
+            android:id="@+id/inspection_data_et_bury_data"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/login_edit_text_bg"
+            android:gravity="top"
+            android:inputType="text"
+            android:textColor="@color/black"
+            tools:ignore="LabelFor"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            android:paddingLeft="20dp"
+            android:paddingTop="5dp"
+            android:text="竣工时间"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+
+        <EditText
+            android:id="@+id/inspection_data_et_finish_dat"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/login_edit_text_bg"
+            android:gravity="top"
+            android:inputType="text"
+            android:textColor="@color/black"
+            tools:ignore="LabelFor"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_20_x"
+            android:layout_marginTop="@dimen/dp_5_y"
+            android:text="情况说明"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+
+        <EditText
+            android:id="@+id/inspection_data_et_detail"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_75_y"
+            android:layout_marginLeft="@dimen/dp_20_x"
+            android:layout_marginRight="@dimen/dp_20_x"
+            android:layout_marginTop="@dimen/dp_5_x"
+            android:background="@drawable/login_edit_text_bg"
+            android:gravity="top|left"
+            android:inputType="text"
+            android:minHeight="@dimen/dp_50_y"
+            android:padding="5dp"
+            tools:ignore="LabelFor"/>
+
+        <Button
+            android:id="@+id/inspection_data_btn_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dp_5_y"
+            android:text="保存"/>
+
+    </LinearLayout>
+
+</ScrollView>

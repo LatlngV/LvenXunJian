@@ -40,7 +40,7 @@ public abstract class BaseListViewAdapter<T> extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(parent.getContext()).inflate(getAdapterLayoutRes(), parent, false);
+            convertView = LayoutInflater.from(mContext).inflate(getAdapterLayoutRes(), parent, false);
         }
         T t = mDatas.get(position);
         initAdapterView(convertView, t);

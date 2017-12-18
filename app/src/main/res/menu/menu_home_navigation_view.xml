@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_home_data_collection"
+        android:icon="@drawable/add_camera"
+        android:title="巡检上报"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_home_repair"
+        android:icon="@drawable/add_camera"
+        android:title="抢维修"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_home_danger_map"
+        android:icon="@drawable/add_camera"
+        android:title="隐患地图"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_home_log_out"
+        android:icon="@drawable/ic_switch_user"
+        android:title="退出登录"
+        app:showAsAction="never"/>
+
+</menu>

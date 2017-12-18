@@ -12,7 +12,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        tools:ignore="UselessParent">
 
         <cn.eyesw.lvenxunjian.widget.CircleImageView
             android:id="@+id/navigayion_view_staff_portrait"

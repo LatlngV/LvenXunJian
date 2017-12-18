@@ -23,5 +23,14 @@ public class Constant {
 
     // 通知 UI 改变的通知
     public static final String TIME_CHANGED_ACTION  = "cn.eyesw.lvenxunjian.time_change_action";
+    // 打印 log 的全局 TAG
+    public static final String TAG = "LOG-TAG";
+
+    // 是否版本更新
+    public static final String VERSION_UPDATE = "versionUpdate";
+    // 下载 apk 的 url
+    public static final String APK_URL = "apkUrl";
+    // 隐患数据标志位
+    public static final String DANGER_DATA_FLAG = "dangerDataFlag";
 
 }

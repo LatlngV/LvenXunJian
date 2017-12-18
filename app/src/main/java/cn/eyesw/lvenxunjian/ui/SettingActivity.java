@@ -43,7 +43,7 @@ public class SettingActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        String[] content = new String[]{"用户资料", "清理缓存", "百度地图"};
+        String[] content = new String[]{"用户资料", "清理缓存"};
         List<String> list = new ArrayList<>();
         Collections.addAll(list, content);
 
@@ -58,9 +58,6 @@ public class SettingActivity extends BaseActivity {
                 break;
             case 1:
                 Toast.makeText(mContext, "清理成功", Toast.LENGTH_SHORT).show();
-                break;
-            case 2:
-                startActivity(BaiduActivity.class);
                 break;
             default:
                 throw new RuntimeException(getString(R.string.unkown_error));
