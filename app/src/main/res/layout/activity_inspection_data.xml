@@ -94,7 +94,7 @@
                 android:id="@+id/inspection_data_before_first"
                 android:layout_width="@dimen/dp_60_x"
                 android:layout_height="@dimen/dp_60_y"
-                android:background="@drawable/add_camera"/>
+                android:background="@drawable/add_image"/>
 
             <View
                 android:layout_width="0dp"
@@ -105,7 +105,7 @@
                 android:id="@+id/inspection_data_before_second"
                 android:layout_width="@dimen/dp_60_x"
                 android:layout_height="@dimen/dp_60_y"
-                android:background="@drawable/add_camera"/>
+                android:background="@drawable/add_image"/>
 
             <View
                 android:layout_width="0dp"
@@ -116,7 +116,7 @@
                 android:id="@+id/inspection_data_before_third"
                 android:layout_width="@dimen/dp_60_x"
                 android:layout_height="@dimen/dp_60_y"
-                android:background="@drawable/add_camera"/>
+                android:background="@drawable/add_image"/>
 
             <View
                 android:layout_width="0dp"
@@ -127,7 +127,7 @@
                 android:id="@+id/inspection_data_before_forth"
                 android:layout_width="@dimen/dp_60_x"
                 android:layout_height="@dimen/dp_60_y"
-                android:background="@drawable/add_camera"/>
+                android:background="@drawable/add_image"/>
 
             <View
                 android:layout_width="0dp"
@@ -239,7 +239,125 @@
             android:inputType="text"
             android:minHeight="@dimen/dp_50_y"
             android:padding="5dp"
+            android:textColor="@color/black"
             tools:ignore="LabelFor"/>
+
+        <LinearLayout
+            android:id="@+id/inspection_data_ll_cathode_board"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingLeft="@dimen/dp_20_x"
+                    android:text="测试盖："
+                    android:textColor="@color/black"
+                    android:textSize="18sp"/>
+
+                <RadioGroup
+                    android:id="@+id/inspection_data_test_cap"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/inspection_data_have_cap"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="有盖"
+                        android:textSize="18sp"/>
+
+                    <RadioButton
+                        android:id="@+id/inspection_data_no_cap"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="无盖"
+                        android:textSize="18sp"/>
+
+                </RadioGroup>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp"
+                android:text="接线情况描述"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+
+            <EditText
+                android:id="@+id/inspection_data_et_line"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/login_edit_text_bg"
+                android:gravity="top"
+                android:inputType="text"
+                android:padding="10dp"
+                tools:ignore="LabelFor"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="通电电位"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+                <EditText
+                    android:id="@+id/inspection_data_et_power1"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/login_edit_text_bg"
+                    android:inputType="number"
+                    android:textColor="@color/black"
+                    tools:ignore="LabelFor"/>
+
+                <EditText
+                    android:id="@+id/inspection_data_et_power2"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/login_edit_text_bg"
+                    android:inputType="number"
+                    android:textColor="@color/black"
+                    tools:ignore="LabelFor"/>
+
+                <EditText
+                    android:id="@+id/inspection_data_et_power3"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/login_edit_text_bg"
+                    android:inputType="number"
+                    android:textColor="@color/black"
+                    tools:ignore="LabelFor"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/inspection_data_btn_save"

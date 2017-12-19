@@ -19,6 +19,7 @@ class RepairManagerActivity : BaseActivity() {
     private var mFlag: Int = 0
     private var mTitle: String? = null
     private var mBundle: Bundle? = null
+    private var mIndex = 0
 
     override fun getContentLayoutRes(): Int = R.layout.activity_repair_manager
 
@@ -45,6 +46,7 @@ class RepairManagerActivity : BaseActivity() {
         repair_radio_group.setOnCheckedChangeListener { _, checkId ->
             when (checkId) {
                 R.id.repair_normal -> {
+                    mIndex = 0
                     if (mNormalFragment == null) {
                         mNormalFragment = NormalFragment()
                     }
@@ -58,6 +60,7 @@ class RepairManagerActivity : BaseActivity() {
                     }
                 }
                 R.id.repair_repair -> {
+                    mIndex = 1
                     if (mRepairFragment == null) {
                         mRepairFragment = RepairFragment()
                     }
@@ -80,6 +83,50 @@ class RepairManagerActivity : BaseActivity() {
             intent.putExtra("title", mTitle)
             intent.putExtra("typeFlag", mFlag.toString())
             startActivity(intent)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        when (mIndex) {
+            0 -> {
+                if (mNormalFragment == null) {
+                    mNormalFragment = NormalFragment()
+                }
+                if (!mNormalFragment!!.isAdded) {
+                    mBundle = Bundle()
+                    mBundle!!.putString("flag", mFlag.toString())
+                    mBundle!!.putString("type", "repair")
+                    mBundle!!.putString("title", mTitle)
+                    mNormalFragment?.arguments = mBundle
+                    replaceFragment(R.id.repair_fl_container, mNormalFragment)
+                }
+            }
+            1 -> {
+                if (mRepairFragment == null) {
+                    mRepairFragment = RepairFragment()
+                }
+                if (!mRepairFragment!!.isAdded) {
+                    mBundle = Bundle()
+                    mBundle!!.putString("flag", mFlag.toString())
+                    mBundle!!.putString("type", "repair")
+                    mBundle!!.putString("title", mTitle)
+                    mRepairFragment?.arguments = mBundle
+                    replaceFragment(R.id.repair_fl_container, mRepairFragment)
+                }
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (mNormalFragment != null) {
+            mNormalFragment!!.isDetached
+            mNormalFragment = null
+        }
+        if (mRepairFragment != null) {
+            mRepairFragment!!.isDetached
+            mRepairFragment = null
         }
     }
 

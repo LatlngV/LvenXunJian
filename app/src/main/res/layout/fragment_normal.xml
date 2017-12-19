@@ -15,11 +15,11 @@
         android:id="@+id/normal_tv_empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#88000000"
+        android:background="#eeeeee"
         android:gravity="center"
         android:text="暂时没有数据"
         android:textColor="@color/black"
-        android:textSize="25sp"
+        android:textSize="20sp"
         android:visibility="gone"/>
 
 </FrameLayout>

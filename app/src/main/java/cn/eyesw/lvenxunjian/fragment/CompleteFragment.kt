@@ -17,7 +17,7 @@ import android.widget.TextView
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import cn.eyesw.lvenxunjian.constant.Constant
-import cn.eyesw.lvenxunjian.ui.DangerDataActivity
+import cn.eyesw.lvenxunjian.ui.StaffDataActivity
 import kotlinx.android.synthetic.main.fragment_complete.*
 
 /**
@@ -43,15 +43,21 @@ class CompleteFragment : BaseFragment() {
                     for (i in 0 until weixiuList.length()) {
                         val data = weixiuList.get(i) as JSONObject
                         val did = data.getString("did")
-                        val dangerType = data.getString("type_name")
+                        var dangerType = data.getString("type_name")
                         val dangerLevel = data.getString("level_name")
                         val staffName = data.getString("staff_name")
                         val dnote = data.getString("dnote")
                         val address = data.getString("addr")
-                        val ctime = data.getString("completetime")
+                        var ctime = data.getString("completetime")
                         val status = data.getString("status")
                         val managerName = data.getString("manager_name")
 
+                        if (dangerType == "null") {
+                            dangerType = ""
+                        }
+                        if (ctime == "null") {
+                            ctime = ""
+                        }
                         val repairMangerEntity = RepairManagerEntity(did, dangerType, dangerLevel, staffName, dnote,
                                 address, ctime, managerName, "", "")
                         if (status == "2") {
@@ -64,9 +70,14 @@ class CompleteFragment : BaseFragment() {
                         complete_list_view.adapter = adapter
 
                         complete_list_view.setOnItemClickListener { _, _, p2, _ ->
-                            val intent = Intent(mContext, DangerDataActivity::class.java)
+                            val repairManagerEntity = mList[p2]
+                            val intent = Intent(mContext, StaffDataActivity::class.java)
                             intent.putExtra(Constant.DANGER_DATA_FLAG, "complete")
-                            intent.putExtra("did", mDidList.get(p2))
+                            intent.putExtra("did", mDidList[p2])
+                            intent.putExtra("staff_name", repairManagerEntity.staffName)
+                            intent.putExtra("addr", repairManagerEntity.address)
+                            intent.putExtra("dnote", repairManagerEntity.dnote)
+                            intent.putExtra("ctime", repairManagerEntity.ctime)
                             startActivity(intent)
                         }
                     }
@@ -94,10 +105,8 @@ class CompleteFragment : BaseFragment() {
         }
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
-            var view: View? = null
-            if (convertView == null) {
-                view = View.inflate(mContext, R.layout.item_complete_message, null)
-            }
+            val view = View.inflate(mContext, R.layout.item_complete_message, null)
+
             val tvCard = view?.findViewById<TextView>(R.id.item_tv_card)
             val tvCreateTime = view?.findViewById<TextView>(R.id.item_tv_create_time)
             val tvDangerType = view?.findViewById<TextView>(R.id.item_tv_danger_type)
@@ -114,7 +123,7 @@ class CompleteFragment : BaseFragment() {
             tvCreateTime?.text = repairMangerEntity.ctime
             tvDangerType?.text = repairMangerEntity.dangerType
             tvAddress?.text = repairMangerEntity.address
-            return view!!
+            return view
         }
     }
 

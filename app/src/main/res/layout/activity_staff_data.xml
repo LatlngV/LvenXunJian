@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cn.eyesw.lvenxunjian.widget.LinearLayoutAdapter
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/staff_data_toolbar"
+        style="@style/ToolbarStyle"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:ignore="UselessParent">
+
+            <TextView
+                android:id="@+id/staff_data_tv_danger_address"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:textColor="#ff0000"
+                android:textSize="18sp"
+                tools:text="隐患位置"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#88000000"/>
+
+            <TextView
+                android:id="@+id/staff_data_tv_danger_des"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                tools:text="隐患描述"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#88000000"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Space
+                    android:layout_width="10dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="上报人:"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/staff_data_tv_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="5dp"
+                    android:gravity="right"
+                    android:textColor="#ff0000"
+                    android:textSize="16sp"
+                    tools:text="张允文"/>
+
+                <Space
+                    android:layout_width="10dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="上报时间:"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/staff_data_tv_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="5dp"
+                    android:gravity="right"
+                    android:textColor="#ff0000"
+                    android:textSize="16sp"
+                    tools:text="2017-03-19"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#88000000"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/staff_data_iv_danger_first"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/add_image"/>
+
+                <Space
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"/>
+
+                <ImageView
+                    android:id="@+id/staff_data_iv_danger_second"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/add_image"/>
+
+                <Space
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"/>
+
+                <ImageView
+                    android:id="@+id/staff_data_iv_danger_third"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/add_image"/>
+
+                <Space
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"/>
+
+                <ImageView
+                    android:id="@+id/staff_data_iv_danger_forth"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/add_image"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#88000000"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:ignore="UselessParent">
+
+            <EditText
+                android:id="@+id/urgent_tv_address"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/login_edit_text_bg"
+                android:gravity="left|top"
+                android:hint="维修位置"
+                android:inputType="text"
+                android:padding="5dp"
+                android:textColor="#ff0000"
+                android:textSize="18sp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#88000000"/>
+
+            <EditText
+                android:id="@+id/urgent_tv_des"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/login_edit_text_bg"
+                android:gravity="left|top"
+                android:hint="维修描述"
+                android:inputType="text"
+                android:padding="5dp"
+                android:textSize="18sp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#88000000"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/staff_data_iv_first"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/add_image"/>
+
+                <Space
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"/>
+
+                <ImageView
+                    android:id="@+id/staff_data_iv_second"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/add_image"/>
+
+                <Space
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"/>
+
+                <ImageView
+                    android:id="@+id/staff_data_iv_third"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/add_image"/>
+
+                <Space
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"/>
+
+                <ImageView
+                    android:id="@+id/staff_data_iv_forth"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/add_image"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#88000000"/>
+
+            <Button
+                android:id="@+id/staff_data_btn_upload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="上    传"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+</cn.eyesw.lvenxunjian.widget.LinearLayoutAdapter>

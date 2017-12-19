@@ -6,6 +6,7 @@ import android.support.v7.app.AlertDialog
 import cn.eyesw.lvenxunjian.R
 import cn.eyesw.lvenxunjian.base.BaseActivity
 import cn.eyesw.lvenxunjian.constant.ApiService
+import cn.eyesw.lvenxunjian.utils.NetWorkUtil
 import cn.eyesw.lvenxunjian.utils.ToolbarUtil
 import com.baidu.location.BDLocationListener
 import com.baidu.location.LocationClient
@@ -23,6 +24,7 @@ import com.baidu.mapapi.map.OverlayOptions
 import kotlinx.android.synthetic.main.activity_danger_map.*
 import me.weyye.hipermission.PermissionItem
 import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.ArrayList
@@ -35,6 +37,7 @@ class DangerMapActivity : BaseActivity() {
     private var mLatLng: LatLng? = null
     private var mOverlayOptions: OverlayOptions? = null
     private var mApiService: ApiService? = null
+    private var mIsFirst = true
 
     override fun getContentLayoutRes(): Int = R.layout.activity_danger_map
 
@@ -44,6 +47,7 @@ class DangerMapActivity : BaseActivity() {
     }
 
     override fun initView() {
+        mApiService = NetWorkUtil.getInstance().apiService
         mBaiduMap = danger_map_view.map
         mBaiduMap?.mapType = BaiduMap.MAP_TYPE_NORMAL
         // 坐标转换
@@ -62,6 +66,8 @@ class DangerMapActivity : BaseActivity() {
         permission(permissions) {
             // 初始化位置
             initLocation()
+            // 百度地图适配 Android7.0
+            mLocationClient?.restart()
         }
     }
 
@@ -93,6 +99,7 @@ class DangerMapActivity : BaseActivity() {
         option.setScanSpan(1000 * 20)
         option.isOpenGps = true
         mLocationClient?.locOption = option
+
         // 开始定位
         mLocationClient?.start()
         // 开启定位图层
@@ -105,9 +112,9 @@ class DangerMapActivity : BaseActivity() {
     private fun drawDangerPoint() {
         val dangerPoint = mApiService?.dangerPoint()
         dangerPoint?.enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(call: retrofit2.Call<ResponseBody>?, response: Response<ResponseBody>?) {
+            override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
                 // 获取 json 数据
-                val json = String(response?.body()!!.bytes())
+                val json = String(response?.body()?.bytes()!!)
                 // 解析 json
                 val jsonArray = JSONArray(json)
                 val length = jsonArray.length() - 1
@@ -158,7 +165,7 @@ class DangerMapActivity : BaseActivity() {
                 }
             }
 
-            override fun onFailure(call: retrofit2.Call<ResponseBody>?, t: Throwable?) {
+            override fun onFailure(call: Call<ResponseBody>?, t: Throwable?) {
                 showToast("网络连接失败")
             }
 
@@ -181,14 +188,17 @@ class DangerMapActivity : BaseActivity() {
         // 设置定位数据
         mBaiduMap?.setMyLocationData(myLocationData)
         val bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.marker)
-        val myLocationConfiguration = MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, bitmapDescriptor)
+        val myLocationConfiguration = MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, false, bitmapDescriptor)
         mBaiduMap?.setMyLocationConfiguration(myLocationConfiguration)
         val latLng = LatLng(latitude, longitude)
         val mapStatus = MapStatus.Builder()
                 .target(latLng)
                 .zoom(18.0f)
                 .build()
-        mBaiduMap?.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mapStatus))
+        if (mIsFirst) {
+            mIsFirst = false
+            mBaiduMap?.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mapStatus))
+        }
     }
 
 }

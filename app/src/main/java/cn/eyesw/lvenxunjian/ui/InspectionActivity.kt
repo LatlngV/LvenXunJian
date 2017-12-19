@@ -28,6 +28,8 @@ class InspectionActivity : BaseActivity() {
     private var mBundle: Bundle? = null
     // 标题
     private var mTitle: String? = null
+    // 判断点击了哪个 RadioButton
+    private var mIndex = 0
 
     override fun getContentLayoutRes(): Int = R.layout.activity_inspection
 
@@ -37,6 +39,66 @@ class InspectionActivity : BaseActivity() {
 
         val toolbarUtil = ToolbarUtil(this)
         toolbarUtil.setToolbar(inspection_toolbar, mTitle)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        when (mIndex) {
+            0 -> {
+                if (mNormalFragment == null) {
+                    mNormalFragment = NormalFragment()
+                }
+                if (!mNormalFragment!!.isAdded) {
+                    mBundle = Bundle()
+                    mBundle!!.putString("title", mTitle)
+                    mBundle!!.putString("flag", mFlag.toString())
+                    mBundle!!.putString("type", "inspection")
+                    mNormalFragment?.arguments = mBundle
+                    replaceFragment(R.id.inspection_fl_container, mNormalFragment)
+                }
+            }
+            1 -> {
+                if (mRepairFragment == null) {
+                    mRepairFragment = RepairFragment()
+                }
+                if (!mRepairFragment!!.isAdded) {
+                    mBundle = Bundle()
+                    mBundle!!.putString("title", mTitle)
+                    mBundle!!.putString("flag", mFlag.toString())
+                    mBundle!!.putString("type", "inspection")
+                    mRepairFragment?.arguments = mBundle
+                    replaceFragment(R.id.inspection_fl_container, mRepairFragment)
+                }
+            }
+            2 -> {
+                if (mUpdateFragment == null) {
+                    mUpdateFragment = UpdateFragment()
+                }
+                if (!mUpdateFragment!!.isAdded) {
+                    mBundle = Bundle()
+                    mBundle!!.putString("title", mTitle)
+                    mBundle!!.putString("flag", mFlag.toString())
+                    mUpdateFragment?.arguments = mBundle
+                    replaceFragment(R.id.inspection_fl_container, mUpdateFragment)
+                }
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (mNormalFragment != null) {
+            mNormalFragment!!.isDetached
+            mNormalFragment = null
+        }
+        if (mRepairFragment != null) {
+            mRepairFragment!!.isDetached
+            mRepairFragment = null
+        }
+        if (mUpdateFragment != null) {
+            mUpdateFragment!!.isDetached
+            mUpdateFragment = null
+        }
     }
 
     override fun initView() {
@@ -56,6 +118,7 @@ class InspectionActivity : BaseActivity() {
         inspection_radio_group.setOnCheckedChangeListener { _, checkId ->
             when (checkId) {
                 R.id.inspection_normal -> { // 正常的数据
+                    mIndex = 0
                     if (mNormalFragment == null) {
                         mNormalFragment = NormalFragment()
                     }
@@ -69,6 +132,7 @@ class InspectionActivity : BaseActivity() {
                     }
                 }
                 R.id.inspection_repair -> { // 维修的数据
+                    mIndex = 1
                     if (mRepairFragment == null) {
                         mRepairFragment = RepairFragment()
                     }
@@ -82,6 +146,7 @@ class InspectionActivity : BaseActivity() {
                     }
                 }
                 R.id.inspection_update -> { // 更换的数据
+                    mIndex = 2
                     if (mUpdateFragment == null) {
                         mUpdateFragment = UpdateFragment()
                     }

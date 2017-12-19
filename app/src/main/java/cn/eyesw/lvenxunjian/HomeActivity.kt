@@ -5,7 +5,6 @@ import android.support.design.widget.NavigationView.OnNavigationItemSelectedList
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
-import android.util.Log
 import android.view.MenuItem
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -32,8 +31,8 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
     private var mBaiduMap: BaiduMap? = null
     private var mLocationClient: LocationClient? = null
     private var mSpUtil: SpUtil? = null
-    // 第一次定位
-    private var isFirstLocation: Boolean = true
+    // 是不是第一次定位
+    private var mIsFirst = true
 
     override fun getContentLayoutRes(): Int = R.layout.activity_home
 
@@ -105,6 +104,7 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
                     }
                 }
                 .setNegativeButton("取消", null)
+                .setCancelable(false)
                 .show()
     }
 
@@ -171,12 +171,12 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
                 .target(latLng)
                 .zoom(18.0f)
                 .build()
-        mBaiduMap?.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mapStatus))
-        if (isFirstLocation) {
-            isFirstLocation = false
-            val city: String = location.city
-            home_toolbar.title = city
+        if (mIsFirst) {
+            mIsFirst = false
+            mBaiduMap?.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mapStatus))
         }
+        val city: String = location.city
+        home_toolbar.title = city
     }
 
 }

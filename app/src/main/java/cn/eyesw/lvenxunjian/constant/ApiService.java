@@ -15,7 +15,7 @@ public interface ApiService {
     /**
      * 隐患点
      */
-    @GET("map_weixiu")
+    @GET("map_yinhuan")
     Call<ResponseBody> dangerPoint();
 
     /**
@@ -26,13 +26,6 @@ public interface ApiService {
     Call<ResponseBody> repairList(@Field("staff_id") String staffId);
 
     /**
-     * 抢维修图片
-     */
-    @FormUrlEncoded
-    @POST("weixiu_content")
-    Call<ResponseBody> dangerPhoto(@Field("weixiu_id") String repairId);
-
-    /**
      * 管理员手机端数据上报
      */
     @FormUrlEncoded
@@ -40,13 +33,25 @@ public interface ApiService {
     Call<ResponseBody> dataReport(@Field("staff_id") String staffId, @Field("type_flg") String deviceType, @Field("status") String status);
 
     /**
-     * 上传新建数据
+     * 维修上传新建数据
      */
     @FormUrlEncoded
     @POST("save_data")
     Call<ResponseBody> saveData(@Field("staff_id") String staffId, @Field("task_id") String taskId, @Field("line_point_id") String linePointId,
                                 @Field("latitude") String latitude, @Field("longitude") String longitude, @Field("address") String address,
                                 @Field("weather") String weather, @Field("note") String note, @Field("type_flg") String typeFlag);
+
+    /**
+     * 隐患上传新建数据
+     */
+    @FormUrlEncoded
+    @POST("save_data")
+    Call<ResponseBody> saveDangerData(@Field("staff_id") String staffId, @Field("task_id") String taskId, @Field("line_point_id") String linePointId,
+                                      @Field("latitude") String latitude, @Field("longitude") String longitude, @Field("address") String address,
+                                      @Field("weather") String weather, @Field("note") String note, @Field("type_flg") String typeFlag,
+                                      @Field("depth") String depth, @Field("finish_time") String finishTime, @Field("status") String status,
+                                      @Field("test_cap") String testCap, @Field("connect_info") String connectInfo, @Field("power1") String power1,
+                                      @Field("power2") String power2, @Field("power3") String power3);
 
     /**
      * 上传照片
@@ -71,5 +76,23 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("report_detail")
     Call<ResponseBody> dataDetail(@Field("data_id") String dataId);
+
+    /**
+     * 解析巡线员上传的照片
+     */
+    @FormUrlEncoded
+    @POST("weixiu_content")
+    Call<ResponseBody> repairPhoto(@Field("weixiu_id") String dataId);
+
+    /**
+     *
+     */
+    @FormUrlEncoded
+    @POST("save_weixiu_check")
+    Call<ResponseBody> saveRepairCheck(@Field("id") String dataId, @Field("note") String note);
+
+    @FormUrlEncoded
+    @POST("upload_weixiu_check_img")
+    Call<ResponseBody> uploadRepairImg(@Field("weixiu_data_id") String dataId, @Field("file") String file, @Field("file_name") String fileName);
 
 }

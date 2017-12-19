@@ -19,6 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="任务卡："
+            android:textColor="@color/black"
             android:textSize="18sp"/>
 
         <TextView
@@ -48,6 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="隐患类型："
+            android:textColor="@color/black"
             android:textSize="15sp"/>
 
         <TextView
@@ -69,6 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="上报人："
+            android:textColor="@color/black"
             android:textSize="15sp"/>
 
         <TextView
@@ -100,6 +103,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="上报时间："
+            android:textColor="@color/black"
             android:textSize="15sp"/>
 
         <TextView
@@ -121,6 +125,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="维修责任人："
+            android:textColor="@color/black"
             android:textSize="15sp"/>
 
 
@@ -152,6 +157,7 @@
             android:layout_gravity="center"
             android:layout_margin="5dp"
             android:text="详细地址："
+            android:textColor="@color/black"
             android:textSize="15sp"/>
 
         <TextView

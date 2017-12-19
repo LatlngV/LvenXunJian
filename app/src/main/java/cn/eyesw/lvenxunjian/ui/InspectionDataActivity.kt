@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -17,14 +16,15 @@ import cn.eyesw.lvenxunjian.R
 import cn.eyesw.lvenxunjian.base.BaseActivity
 import cn.eyesw.lvenxunjian.constant.ApiService
 import cn.eyesw.lvenxunjian.constant.Constant
+import cn.eyesw.lvenxunjian.utils.BitmapUtil
 import cn.eyesw.lvenxunjian.utils.NetWorkUtil
+import cn.eyesw.lvenxunjian.utils.SpUtil
 import cn.eyesw.lvenxunjian.utils.ToolbarUtil
 import com.baidu.location.BDLocation
 import com.baidu.location.BDLocationListener
 import com.baidu.location.LocationClient
 import com.baidu.location.LocationClientOption
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.activity_danger_data.*
 import kotlinx.android.synthetic.main.activity_inspection_data.*
 import me.weyye.hipermission.PermissionItem
 import okhttp3.ResponseBody
@@ -42,9 +42,9 @@ class InspectionDataActivity : BaseActivity() {
     private var mLocationClient: LocationClient? = null
     private var mMyLocationListener: MyLocationListener? = null
     // 纬度
-    private var mLatitude: Double = 0.0
+    private var mLatitude: String? = null
     // 经度
-    private var mLongitude: Double = 0.0
+    private var mLongitude: String? = null
     // 地址
     private var mAddress: String? = null
     // 类型标志位
@@ -72,8 +72,11 @@ class InspectionDataActivity : BaseActivity() {
         mDataId = intent.getStringExtra("dataId")
         mStatus = intent.getStringExtra("status")
         mTypeFlag = intent.getStringExtra("typeFlag")
-
         val title = intent.getStringExtra("title")
+
+        if (mTypeFlag == "3") {
+            inspection_data_ll_cathode_board.visibility = View.VISIBLE
+        }
 
         val toolbarUtil = ToolbarUtil(this)
         toolbarUtil.setToolbar(inspection_data_toolbar, title)
@@ -82,6 +85,7 @@ class InspectionDataActivity : BaseActivity() {
     override fun initView() {
         mApiServer = NetWorkUtil.getInstance().apiService
         mImageUrl = mutableListOf()
+        mLocationClient = LocationClient(mContext)
         mImageViewList = listOf(inspection_data_before_first, inspection_data_before_second, inspection_data_before_third, inspection_data_before_forth)
         if (mStatus == "0") { // 从创建来的
             mMyLocationListener = MyLocationListener()
@@ -111,10 +115,78 @@ class InspectionDataActivity : BaseActivity() {
     }
 
     /**
-     * 请求数据
+     * 上传数据
      */
     private fun reportData() {
+        // 没有数据就设置数据
+        if (mAddress == null) {
+            showToast("请先获取地理位置")
+            return
+        }
+        val spUtil = SpUtil.getInstance(mContext)
+        val note = inspection_data_et_detail.text.toString()
+        val depth = inspection_data_et_bury_data.text.toString()
+        val finishTime = inspection_data_et_finish_dat.text.toString()
+        var status = "0"
+        when {
+            inspection_data_rb_normal.isChecked -> status = "0"
+            inspection_data_rb_repair.isChecked -> status = "1"
+            inspection_data_rb_update.isChecked -> status = "2"
+        }
+        var testCap = "0"
+        when {
+            inspection_data_have_cap.isChecked -> testCap = "1"
+            inspection_data_no_cap.isChecked -> testCap = "0"
+        }
+        val connectInfo = inspection_data_et_line.text.toString()
+        val power1 = inspection_data_et_power1.text.toString()
+        val power2 = inspection_data_et_power2.text.toString()
+        val power3 = inspection_data_et_power3.text.toString()
+        val saveDangerData = mApiServer?.saveDangerData(spUtil.getString("id"), "0", "0", mLatitude, mLongitude, mAddress, "",
+                note, mTypeFlag, depth, finishTime, status, testCap, connectInfo, power1, power2, power3)
+        saveDangerData?.enqueue(object : Callback<ResponseBody> {
+            override fun onFailure(call: Call<ResponseBody>?, t: Throwable?) {
+                showToast(getString(R.string.network_error))
+            }
 
+            override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
+                val json = String(response?.body()?.bytes()!!)
+                val obj = JSONObject(json)
+                val code = obj.getInt("code")
+                if (code == 200) {
+                    mDataId = obj.getJSONObject("data").getString("id")
+                    // 上传照片
+                    uploadImg()
+                }
+            }
+
+        })
+    }
+
+    /**
+     * 上传照片
+     */
+    private fun uploadImg() {
+        var index = 0
+        (0 until mBitmapList.size)
+                .asSequence()
+                .map { mApiServer?.uploadImg(mDataId, "1", BitmapUtil.convertBitmapToString(mBitmapList[it]), mFileName, "0") }
+                .forEach {
+                    it?.enqueue(object : Callback<ResponseBody> {
+                        override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
+                            showToast("上传成功")
+                            index += 1
+                            if (index == mBitmapList.size) {
+                                finish()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<ResponseBody>?, t: Throwable?) {
+                            showToast(getString(R.string.network_error))
+                        }
+
+                    })
+                }
     }
 
     /**
@@ -129,33 +201,40 @@ class InspectionDataActivity : BaseActivity() {
 
             override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
                 val json = String(response?.body()?.bytes()!!)
-                Log.d("tag", json)
                 val jsonObject = JSONObject(json)
                 val code = jsonObject.getInt("code")
                 if (code == 200) {
                     val data = jsonObject.getJSONObject("data").getJSONObject("report_detail")
-                    mLatitude = data.getString("latitude").toDouble()
-                    mLongitude = data.getString("longitude").toDouble()
+                    mLatitude = data.getString("latitude")
+                    mLongitude = data.getString("longitude")
                     mAddress = data.getString("address")
                     val note = data.getString("note")
                     val status = data.getString("status") /* 状态，0 是正常，1 是建议维修，2是建议更换 */
                     val depth = data.getString("depth")
                     val finishTime = data.getString("finish_time")
                     val images = data.getJSONArray("images")
+                    val testCap = data.getString("test_cap")
+                    val connectInfo = data.getString("connect_info")
+                    val power1 = data.getString("power1")
+                    val power2 = data.getString("power2")
+                    val power3 = data.getString("power3")
 
                     inspection_data_tv_latitude.text = mLatitude.toString()
                     inspection_data_tv_longitude.text = mLongitude.toString()
                     inspection_data_tv_address.text = mAddress
+                    // 埋深数据
                     if (depth == "null") {
                         inspection_data_et_bury_data.setText("")
                     } else {
                         inspection_data_et_bury_data.setText(depth)
                     }
+                    // 竣工时间
                     if (finishTime == "null") {
                         inspection_data_et_finish_dat.setText("")
                     } else {
                         inspection_data_et_finish_dat.setText(finishTime)
                     }
+                    // 情况说明
                     inspection_data_et_detail.setText(note)
                     for (i in 0 until images.length()) {
                         val url = images.optString(i)
@@ -164,11 +243,26 @@ class InspectionDataActivity : BaseActivity() {
                             Picasso.with(mContext).load(url).into(mImageViewList?.get(i))
                         }
                     }
+                    // 设备描述状态
                     when (status) {
                         "0" -> inspection_data_radio_group.check(R.id.inspection_data_rb_normal)
                         "1" -> inspection_data_radio_group.check(R.id.inspection_data_rb_repair)
                         "2" -> inspection_data_radio_group.check(R.id.inspection_data_rb_update)
                     }
+                    // 有无测试盖
+                    inspection_data_have_cap.isEnabled = false
+                    inspection_data_no_cap.isEnabled = false
+                    if (testCap == "1") { /* {"1": 有盖, "0": 无盖} */
+                        inspection_data_test_cap.check(R.id.inspection_data_have_cap)
+                    } else {
+                        inspection_data_test_cap.check(R.id.inspection_data_no_cap)
+                    }
+                    // 接线情况说明
+                    inspection_data_et_line.setText(connectInfo)
+                    //通电点位
+                    inspection_data_et_power1.setText(power1)
+                    inspection_data_et_power2.setText(power2)
+                    inspection_data_et_power3.setText(power3)
                 }
             }
 
@@ -331,19 +425,19 @@ class InspectionDataActivity : BaseActivity() {
             val bitmap = extras.getParcelable<Bitmap>("data")
             when (position) {
                 0 -> {
-                    danger_data_before_first.setImageBitmap(bitmap)
+                    inspection_data_before_first.setImageBitmap(bitmap)
                     mBitmapList.add(bitmap)
                 }
                 1 -> {
-                    danger_data_before_second.setImageBitmap(bitmap)
+                    inspection_data_before_second.setImageBitmap(bitmap)
                     mBitmapList.add(bitmap)
                 }
                 2 -> {
-                    danger_data_before_third.setImageBitmap(bitmap)
+                    inspection_data_before_third.setImageBitmap(bitmap)
                     mBitmapList.add(bitmap)
                 }
                 3 -> {
-                    danger_data_before_forth.setImageBitmap(bitmap)
+                    inspection_data_before_forth.setImageBitmap(bitmap)
                     mBitmapList.add(bitmap)
                 }
             }
@@ -352,8 +446,8 @@ class InspectionDataActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-        mLocationClient?.registerLocationListener(mMyLocationListener)
         if (mStatus == "0") {
+            mLocationClient?.registerLocationListener(mMyLocationListener)
             val permissions = ArrayList<PermissionItem>()
             permissions.add(PermissionItem(Manifest.permission.ACCESS_FINE_LOCATION, "精确位置", R.drawable.permission_ic_location))
             permission(permissions) {
@@ -390,15 +484,15 @@ class InspectionDataActivity : BaseActivity() {
         override fun onReceiveLocation(location: BDLocation?) {
             if (location == null) return
             // 纬度
-            mLatitude = location.latitude
+            mLatitude = location.latitude.toString()
             // 经度
-            mLongitude = location.longitude
+            mLongitude = location.longitude.toString()
             // 地址
             mAddress = location.addrStr
 
             inspection_data_tv_latitude.text = mLatitude.toString()
             inspection_data_tv_longitude.text = mLongitude.toString()
-            inspection_data_tv_address.text = mAddress
+            inspection_data_tv_address.text = mAddress.toString()
         }
     }
 

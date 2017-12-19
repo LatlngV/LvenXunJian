@@ -5,19 +5,19 @@
 
     <item
         android:id="@+id/menu_home_data_collection"
-        android:icon="@drawable/add_camera"
+        android:icon="@drawable/data_collection1"
         android:title="巡检上报"
         app:showAsAction="never"/>
 
     <item
         android:id="@+id/menu_home_repair"
-        android:icon="@drawable/add_camera"
+        android:icon="@drawable/data_collection2"
         android:title="抢维修"
         app:showAsAction="never"/>
 
     <item
         android:id="@+id/menu_home_danger_map"
-        android:icon="@drawable/add_camera"
+        android:icon="@drawable/data_collection3"
         android:title="隐患地图"
         app:showAsAction="never"/>
 

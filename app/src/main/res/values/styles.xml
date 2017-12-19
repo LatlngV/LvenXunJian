@@ -8,8 +8,8 @@
 
     <style name="ToolbarStyle">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">?attr/actionBarSize</item>
-        <item name="android:background">@android:color/darker_gray</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:background">#88000000</item>
     </style>
 
     <style name="MainLinearLayout">

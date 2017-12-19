@@ -2,11 +2,9 @@ package cn.eyesw.lvenxunjian.fragment
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.TextView
-import android.widget.Toast
 import cn.eyesw.lvenxunjian.R
 import cn.eyesw.lvenxunjian.base.BaseFragment
 import cn.eyesw.lvenxunjian.base.BaseListViewAdapter

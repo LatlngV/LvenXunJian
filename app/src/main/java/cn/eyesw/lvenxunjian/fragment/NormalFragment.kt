@@ -2,7 +2,6 @@ package cn.eyesw.lvenxunjian.fragment
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.TextView
@@ -54,7 +53,6 @@ class NormalFragment : BaseFragment() {
                 // 解析 json 数据
                 analysisData(json)
             }
-
         })
 
         normal_list_view.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->

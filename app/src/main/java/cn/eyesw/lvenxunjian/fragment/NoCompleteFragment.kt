@@ -1,6 +1,7 @@
 package cn.eyesw.lvenxunjian.fragment
 
 import android.content.Intent
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
@@ -11,9 +12,10 @@ import cn.eyesw.lvenxunjian.base.BaseFragment
 import cn.eyesw.lvenxunjian.bean.RepairManagerEntity
 import cn.eyesw.lvenxunjian.constant.Constant
 import cn.eyesw.lvenxunjian.ui.DangerDataActivity
+import cn.eyesw.lvenxunjian.ui.StaffDataActivity
 import cn.eyesw.lvenxunjian.utils.NetWorkUtil
 import cn.eyesw.lvenxunjian.utils.SpUtil
-import kotlinx.android.synthetic.main.fragment_complete.*
+import kotlinx.android.synthetic.main.fragment_no_complete.*
 import okhttp3.ResponseBody
 import org.json.JSONObject
 import retrofit2.Call
@@ -36,6 +38,7 @@ class NoCompleteFragment : BaseFragment() {
         repairList.enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
                 val json = String(response?.body()?.bytes()!!)
+                Log.d("tag", json)
                 val jsonObject = JSONObject(json)
                 val code = jsonObject.getInt("code")
                 if (code == 200) {
@@ -43,17 +46,23 @@ class NoCompleteFragment : BaseFragment() {
                     for (i in 0 until weixiuList.length()) {
                         val data = weixiuList.get(i) as JSONObject
                         val did = data.getString("did")
-                        val dangerType = data.getString("type_name")
+                        var dangerType = data.getString("type_name")
                         val dangerLevel = data.getString("level_name")
                         val staffName = data.getString("staff_name")
                         val dnote = data.getString("dnote")
                         val address = data.getString("addr")
-                        val ctime = data.getString("completetime")
+                        var ctime = data.getString("completetime")
                         val status = data.getString("status")
                         val managerName = data.getString("manager_name")
                         val longitude = data.getString("longitude")
                         val latitude = data.getString("latitude")
 
+                        if (dangerType == "null") {
+                            dangerType = ""
+                        }
+                        if (ctime == "null") {
+                            ctime = ""
+                        }
                         val repairMangerEntity = RepairManagerEntity(did, dangerType, dangerLevel, staffName, dnote,
                                 address, ctime, managerName, latitude, longitude)
                         val roleName = SpUtil.getInstance(mContext).getString("roleName")
@@ -66,13 +75,18 @@ class NoCompleteFragment : BaseFragment() {
                         mDidList.add(did)
                     }
                     if (mList.size > 0) {
-                        val adapter = CompleteMessageAdapter()
-                        complete_list_view.adapter = adapter
+                        val adapter = NoCompleteMessageAdapter()
+                        no_complete_list_view.adapter = adapter
 
-                        complete_list_view.setOnItemClickListener { _, _, p2, _ ->
-                            val intent = Intent(mContext, DangerDataActivity::class.java)
+                        no_complete_list_view.setOnItemClickListener { _, _, p2, _ ->
+                            val repairManagerEntity = mList[p2]
+                            val intent = Intent(mContext, StaffDataActivity::class.java)
                             intent.putExtra(Constant.DANGER_DATA_FLAG, "noComplete")
                             intent.putExtra("did", mDidList[p2])
+                            intent.putExtra("staff_name", repairManagerEntity.staffName)
+                            intent.putExtra("addr", repairManagerEntity.address)
+                            intent.putExtra("dnote", repairManagerEntity.dnote)
+                            intent.putExtra("ctime", repairManagerEntity.ctime)
                             startActivity(intent)
                         }
                     }
@@ -85,7 +99,7 @@ class NoCompleteFragment : BaseFragment() {
         })
     }
 
-    private inner class CompleteMessageAdapter : BaseAdapter() {
+    private inner class NoCompleteMessageAdapter : BaseAdapter() {
 
         override fun getCount(): Int {
             return if (mList.size > 0) mList.size else 0
@@ -100,10 +114,8 @@ class NoCompleteFragment : BaseFragment() {
         }
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
-            var view: View? = null
-            if (convertView == null) {
-                view = View.inflate(mContext, R.layout.item_complete_message, null)
-            }
+            val view = View.inflate(mContext, R.layout.item_complete_message, null)
+
             val tvNumber = view?.findViewById<TextView>(R.id.item_tv_number)
             val tvUploadName = view?.findViewById<TextView>(R.id.item_tv_upload_name)
             val tvRepairName = view?.findViewById<TextView>(R.id.item_tv_repair_name)
@@ -126,7 +138,7 @@ class NoCompleteFragment : BaseFragment() {
             tvAddress?.text = dangerManagerEntity.address
             tvNumber?.text = (position + 1).toString()
 
-            return view!!
+            return view
         }
     }
 

@@ -35,14 +35,18 @@ class UrgentRepairActivity : BaseActivity() {
                     if (mNoCompleteFragment == null) {
                         mNoCompleteFragment = NoCompleteFragment()
                     }
-                    replaceFragment(R.id.urgent_repair_fl_container, mNoCompleteFragment)
+                    if (!mNoCompleteFragment?.isAdded!!) {
+                        replaceFragment(R.id.urgent_repair_fl_container, mNoCompleteFragment)
+                    }
                 }
                 // 已完成
                 R.id.urgent_repair_complete -> {
                     if (mCompleteFragment == null) {
                         mCompleteFragment = CompleteFragment()
                     }
-                    replaceFragment(R.id.urgent_repair_fl_container, mCompleteFragment)
+                    if (!mCompleteFragment?.isAdded!!) {
+                        replaceFragment(R.id.urgent_repair_fl_container, mCompleteFragment)
+                    }
                 }
             }
         }

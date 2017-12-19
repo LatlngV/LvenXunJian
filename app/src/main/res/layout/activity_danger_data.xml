@@ -91,7 +91,7 @@
             android:id="@+id/danger_data_before_first"
             android:layout_width="@dimen/dp_60_x"
             android:layout_height="@dimen/dp_60_y"
-            android:background="@drawable/add_camera"/>
+            android:background="@drawable/add_image"/>
 
         <View
             android:layout_width="0dp"
@@ -102,7 +102,7 @@
             android:id="@+id/danger_data_before_second"
             android:layout_width="@dimen/dp_60_x"
             android:layout_height="@dimen/dp_60_y"
-            android:background="@drawable/add_camera"/>
+            android:background="@drawable/add_image"/>
 
         <View
             android:layout_width="0dp"
@@ -113,7 +113,7 @@
             android:id="@+id/danger_data_before_third"
             android:layout_width="@dimen/dp_60_x"
             android:layout_height="@dimen/dp_60_y"
-            android:background="@drawable/add_camera"/>
+            android:background="@drawable/add_image"/>
 
         <View
             android:layout_width="0dp"
@@ -124,7 +124,7 @@
             android:id="@+id/danger_data_before_forth"
             android:layout_width="@dimen/dp_60_x"
             android:layout_height="@dimen/dp_60_y"
-            android:background="@drawable/add_camera"/>
+            android:background="@drawable/add_image"/>
 
         <View
             android:layout_width="0dp"
@@ -159,7 +159,7 @@
             android:id="@+id/danger_data_after_first"
             android:layout_width="@dimen/dp_60_x"
             android:layout_height="@dimen/dp_60_y"
-            android:background="@drawable/add_camera"/>
+            android:background="@drawable/add_image"/>
 
         <View
             android:layout_width="0dp"
@@ -170,7 +170,7 @@
             android:id="@+id/danger_data_after_second"
             android:layout_width="@dimen/dp_60_x"
             android:layout_height="@dimen/dp_60_y"
-            android:background="@drawable/add_camera"/>
+            android:background="@drawable/add_image"/>
 
         <View
             android:layout_width="0dp"
@@ -181,7 +181,7 @@
             android:id="@+id/danger_data_after_third"
             android:layout_width="@dimen/dp_60_x"
             android:layout_height="@dimen/dp_60_y"
-            android:background="@drawable/add_camera"/>
+            android:background="@drawable/add_image"/>
 
         <View
             android:layout_width="0dp"
@@ -192,7 +192,7 @@
             android:id="@+id/danger_data_after_forth"
             android:layout_width="@dimen/dp_60_x"
             android:layout_height="@dimen/dp_60_y"
-            android:background="@drawable/add_camera"
+            android:background="@drawable/add_image"
             android:scaleType="fitXY"/>
 
         <View

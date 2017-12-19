@@ -96,6 +96,7 @@ public class PatrolTaskActivity extends BaseActivity {
     private BitmapDescriptor mBitmapDescriptor;
     private LatlngEntityDao mLatlngEntityDao;
     private LatlngEntity mLatlngEntity;
+    private boolean mIsFirst = true;
 
     @BindView(R.id.patrol_task_toolbar)
     protected Toolbar mToolbar;
@@ -727,7 +728,10 @@ public class PatrolTaskActivity extends BaseActivity {
             LatLng ll = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
             MapStatus.Builder builder = new MapStatus.Builder();
             builder.target(ll).zoom(18.0f);
-            mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+            if (mIsFirst) {
+                mIsFirst = false;
+                mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+            }
         }
     }
 
