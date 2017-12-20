@@ -102,11 +102,9 @@ class InspectionActivity : BaseActivity() {
     }
 
     override fun initView() {
-        mNormalFragment = NormalFragment()
-        mUpdateFragment = UpdateFragment()
-        mRepairFragment = RepairFragment()
 
         /* 进来默认显示正常的数据 */
+        mNormalFragment = NormalFragment()
         mBundle = Bundle()
         mBundle!!.putString("title", mTitle)
         mBundle!!.putString("flag", mFlag.toString())

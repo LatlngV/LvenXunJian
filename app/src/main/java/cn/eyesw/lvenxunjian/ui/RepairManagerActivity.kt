@@ -19,7 +19,8 @@ class RepairManagerActivity : BaseActivity() {
     private var mFlag: Int = 0
     private var mTitle: String? = null
     private var mBundle: Bundle? = null
-    private var mIndex = 0
+    /* 判断点击了哪个 Fragment */
+    private var mIndex = 1
 
     override fun getContentLayoutRes(): Int = R.layout.activity_repair_manager
 
@@ -45,7 +46,7 @@ class RepairManagerActivity : BaseActivity() {
         // RadioGroup 监听事件
         repair_radio_group.setOnCheckedChangeListener { _, checkId ->
             when (checkId) {
-                R.id.repair_normal -> {
+                R.id.repair_normal -> { // 已完成
                     mIndex = 0
                     if (mNormalFragment == null) {
                         mNormalFragment = NormalFragment()
@@ -59,7 +60,7 @@ class RepairManagerActivity : BaseActivity() {
                         replaceFragment(R.id.repair_fl_container, mNormalFragment)
                     }
                 }
-                R.id.repair_repair -> {
+                R.id.repair_repair -> { // 未完成
                     mIndex = 1
                     if (mRepairFragment == null) {
                         mRepairFragment = RepairFragment()

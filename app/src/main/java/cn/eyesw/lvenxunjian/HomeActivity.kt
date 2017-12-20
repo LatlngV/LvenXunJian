@@ -5,9 +5,11 @@ import android.support.design.widget.NavigationView.OnNavigationItemSelectedList
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
+import android.view.KeyEvent
 import android.view.MenuItem
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import cn.eyesw.lvenxunjian.base.BaseActivity
 import cn.eyesw.lvenxunjian.constant.Constant
 import cn.eyesw.lvenxunjian.ui.*
@@ -33,6 +35,8 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
     private var mSpUtil: SpUtil? = null
     // 是不是第一次定位
     private var mIsFirst = true
+    // 记录按下返回键的时间
+    private var startTime: Long = 0
 
     override fun getContentLayoutRes(): Int = R.layout.activity_home
 
@@ -177,6 +181,28 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
         }
         val city: String = location.city
         home_toolbar.title = city
+    }
+
+    /**
+     * 按下返回键时，先判断 DrawerLayout 是不是打开的
+     * 如果 DrawerLayout 是打开的，就让 DrawerLayout 关闭
+     * 否则在 2s 时间内按两下返回键就退出程序
+     */
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (home_drawer_layout.isDrawerOpen(GravityCompat.START)) {
+                home_drawer_layout.closeDrawer(GravityCompat.START)
+            } else {
+                if (System.currentTimeMillis() - startTime > 2000) {
+                    Toast.makeText(mContext, "再按一次退出", Toast.LENGTH_SHORT).show()
+                    startTime = System.currentTimeMillis()
+                    return true
+                } else {
+                    System.exit(0)
+                }
+            }
+        }
+        return false
     }
 
 }

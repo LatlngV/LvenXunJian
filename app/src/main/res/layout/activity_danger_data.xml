@@ -230,6 +230,8 @@
         android:layout_marginRight="@dimen/dp_20_x"
         android:layout_marginTop="@dimen/dp_5_x"
         android:background="@drawable/login_edit_text_bg"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:gravity="top|left"
         android:inputType="text"
         android:minHeight="@dimen/dp_50_y"
