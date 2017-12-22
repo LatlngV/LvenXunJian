@@ -26,6 +26,9 @@ import okhttp3.Call;
 
 /**
  * 闪屏界面
+ * <p>
+ * 程序入口
+ * </p>
  */
 public class SplashActivity extends BaseActivity {
 
@@ -97,30 +100,33 @@ public class SplashActivity extends BaseActivity {
         map.put("staff_id", mSpUtil.getString("id"));
         OkHttpManager.getInstance()
                 .postAsyncForm(NetworkApi.VERSION, map, new OkHttpManager.DataCallback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                showToast("网络连接失败");
-            }
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        showToast("网络连接失败");
+                    }
 
-            @Override
-            public void onResponse(String json) {
-                try {
-                    JSONObject object = new JSONObject(json);
-                    int code = object.getInt("code");
-                    if (code == 200) {
-                        JSONObject data = object.getJSONObject("data");
-                        String version = data.getString("app_version");
-                        String appUrl = data.getString("app_download_url");
-                        if (!version.equals(getVersion())) {
-                            mSpUtil.putBoolean(Constant.VERSION_UPDATE, true);
-                            mSpUtil.putString(Constant.APK_URL, appUrl);
+                    @Override
+                    public void onResponse(String json) {
+                        try {
+                            JSONObject object = new JSONObject(json);
+                            int code = object.getInt("code");
+                            if (code == 200) {
+                                JSONObject data = object.getJSONObject("data");
+                                String version = data.getString("app_version");
+                                String appUrl = data.getString("app_download_url");
+
+                                if (!version.equals(getVersion())) {
+                                    mSpUtil.putBoolean(Constant.VERSION_UPDATE, true);
+                                    mSpUtil.putString(Constant.APK_URL, appUrl);
+                                } else {
+                                    mSpUtil.putBoolean(Constant.VERSION_UPDATE, false);
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+                });
     }
 
     /**

@@ -33,9 +33,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:button="@null"
+            android:checked="true"
             android:padding="@dimen/dp_5_x"
             android:text="维修中"
+            android:textColor="@color/select_radio_button"
             android:textSize="18sp"/>
+
+        <View
+            android:layout_width="@dimen/dp_1_x"
+            android:layout_height="25dp"
+            android:layout_gravity="center_vertical"
+            android:background="#88000000"/>
 
         <RadioButton
             android:id="@+id/repair_normal"
@@ -44,6 +52,7 @@
             android:button="@null"
             android:padding="@dimen/dp_5_x"
             android:text="已完成"
+            android:textColor="@color/select_radio_button"
             android:textSize="18sp"/>
 
     </RadioGroup>

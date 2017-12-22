@@ -1,7 +1,7 @@
 package cn.eyesw.lvenxunjian.fragment
 
+import android.annotation.SuppressLint
 import android.content.Intent
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
@@ -11,7 +11,6 @@ import cn.eyesw.lvenxunjian.R
 import cn.eyesw.lvenxunjian.base.BaseFragment
 import cn.eyesw.lvenxunjian.bean.RepairManagerEntity
 import cn.eyesw.lvenxunjian.constant.Constant
-import cn.eyesw.lvenxunjian.ui.DangerDataActivity
 import cn.eyesw.lvenxunjian.ui.StaffDataActivity
 import cn.eyesw.lvenxunjian.utils.NetWorkUtil
 import cn.eyesw.lvenxunjian.utils.SpUtil
@@ -21,6 +20,17 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.baidu.mapapi.utils.OpenClientUtil
+import android.support.v7.app.AlertDialog
+import com.baidu.location.BDLocation
+import com.baidu.location.BDLocationListener
+import com.baidu.location.LocationClient
+import com.baidu.location.LocationClientOption
+import com.baidu.mapapi.navi.BaiduMapAppNotSupportNaviException
+import com.baidu.mapapi.navi.BaiduMapNavigation
+import com.baidu.mapapi.navi.NaviParaOption
+import com.baidu.mapapi.model.LatLng
+
 
 /**
  * 未完成
@@ -29,16 +39,22 @@ class NoCompleteFragment : BaseFragment() {
 
     private val mList = mutableListOf<RepairManagerEntity>()
     private val mDidList = mutableListOf<String>()
+    private var mLocationClient: LocationClient? = null
+    private var mLatitude = 0.0
+    private var mLongitude = 0.0
 
     override fun getContentLayoutRes(): Int = R.layout.fragment_no_complete
 
     override fun initView() {
+        /* 初始化定位 */
+        initLocation()
+
+        /* 请求数据 */
         val apiService = NetWorkUtil.getInstance().apiService
         val repairList = apiService.repairList(SpUtil.getInstance(mContext).getString("id"))
         repairList.enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
                 val json = String(response?.body()?.bytes()!!)
-                Log.d("tag", json)
                 val jsonObject = JSONObject(json)
                 val code = jsonObject.getInt("code")
                 if (code == 200) {
@@ -99,6 +115,39 @@ class NoCompleteFragment : BaseFragment() {
         })
     }
 
+    /**
+     * 初始化位置
+     */
+    private fun initLocation() {
+        val locationListener = MyLocationListener()
+        mLocationClient = LocationClient(mContext)
+        mLocationClient?.registerLocationListener(locationListener)
+        val option = LocationClientOption()
+        // 当前位置
+        option.setIsNeedAddress(true)
+        // 打开 gps
+        option.isOpenGps = true
+        // 设置坐标类型
+        option.setCoorType("bd09ll")
+        // 定位的频率
+        option.setScanSpan(1000 * 20)
+        mLocationClient?.locOption = option
+        mLocationClient?.start()
+    }
+
+    private inner class MyLocationListener : BDLocationListener {
+        override fun onReceiveLocation(location: BDLocation?) {
+            if (location == null) return
+            mLatitude = location.latitude
+            mLongitude = location.longitude
+            mLocationClient?.stop()
+        }
+
+    }
+
+    /**
+     * 适配器
+     */
     private inner class NoCompleteMessageAdapter : BaseAdapter() {
 
         override fun getCount(): Int {
@@ -113,6 +162,7 @@ class NoCompleteFragment : BaseFragment() {
             return position.toLong()
         }
 
+        @SuppressLint("ViewHolder")
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
             val view = View.inflate(mContext, R.layout.item_complete_message, null)
 
@@ -137,6 +187,39 @@ class NoCompleteFragment : BaseFragment() {
             tvDangerType?.text = dangerManagerEntity.dangerType
             tvAddress?.text = dangerManagerEntity.address
             tvNumber?.text = (position + 1).toString()
+
+            // 百度地图导航
+            tvAddress!!.setOnClickListener {
+                val startPoint = LatLng(mLatitude, mLongitude)
+                val endPoint = LatLng(dangerManagerEntity.latitude.toDouble(),
+                        dangerManagerEntity.longitude.toDouble())
+                try {
+                    val paraOption = NaviParaOption()
+                            .startPoint(startPoint)
+                            .endPoint(endPoint)
+                    BaiduMapNavigation.openBaiduMapNavi(paraOption, mContext)
+                } catch (e: NumberFormatException) {
+                    e.printStackTrace()
+                    AlertDialog.Builder(mContext)
+                            .setTitle("提示")
+                            .setMessage("您尚未安装百度地图APP或APP版本过低，请确认安装？")
+                            .setPositiveButton("确定", { dialog, _ ->
+                                OpenClientUtil.getBaiduMapVersion(activity)
+                                dialog.dismiss()
+                            })
+                            .setNegativeButton("取消", null)
+                            .show()
+                } catch (e: BaiduMapAppNotSupportNaviException) {
+                    e.printStackTrace()
+                    AlertDialog.Builder(mContext)
+                            .setTitle("提示")
+                            .setMessage("您尚未安装百度地图APP或APP版本过低，请确认安装？")
+                            .setPositiveButton("确定", { dialog, _ ->
+                        OpenClientUtil.getBaiduMapVersion(activity)
+                        dialog.dismiss()
+                    }).setNegativeButton("取消", null).show()
+                }
+            }
 
             return view
         }

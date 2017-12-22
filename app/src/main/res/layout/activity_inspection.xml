@@ -33,9 +33,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:button="@null"
+            android:checked="true"
             android:padding="@dimen/dp_5_x"
             android:text="正常"
+            android:textColor="@color/select_radio_button"
             android:textSize="18sp"/>
+
+        <View
+            android:layout_width="@dimen/dp_1_x"
+            android:layout_height="25dp"
+            android:layout_gravity="center_vertical"
+            android:background="#88000000"/>
 
         <RadioButton
             android:id="@+id/inspection_repair"
@@ -44,7 +52,14 @@
             android:button="@null"
             android:padding="@dimen/dp_5_x"
             android:text="建议维修"
+            android:textColor="@color/select_radio_button"
             android:textSize="18sp"/>
+
+        <View
+            android:layout_width="@dimen/dp_1_x"
+            android:layout_height="25dp"
+            android:layout_gravity="center_vertical"
+            android:background="#88000000"/>
 
         <RadioButton
             android:id="@+id/inspection_update"
@@ -53,6 +68,7 @@
             android:button="@null"
             android:padding="@dimen/dp_5_x"
             android:text="建议更换"
+            android:textColor="@color/select_radio_button"
             android:textSize="18sp"/>
 
     </RadioGroup>

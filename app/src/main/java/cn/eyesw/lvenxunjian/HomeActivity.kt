@@ -7,9 +7,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.view.KeyEvent
 import android.view.MenuItem
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import cn.eyesw.lvenxunjian.base.BaseActivity
 import cn.eyesw.lvenxunjian.constant.Constant
 import cn.eyesw.lvenxunjian.ui.*
@@ -37,6 +35,8 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
     private var mIsFirst = true
     // 记录按下返回键的时间
     private var startTime: Long = 0
+    // 地图状态
+    private var mMapStatus: MapStatus? = null
 
     override fun getContentLayoutRes(): Int = R.layout.activity_home
 
@@ -58,6 +58,36 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
         }
 
         initNavigationView()
+
+        /* 初始化地图类型 */
+        setMapType()
+
+        /* 定位 */
+        setLocation()
+    }
+
+    /**
+     * 定位
+     */
+    private fun setLocation() {
+        home_tv_location.setOnClickListener {
+            // 地图移动到当前位置
+            mBaiduMap?.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mMapStatus))
+        }
+    }
+
+    /**
+     * 设置地图类型
+     */
+    private fun setMapType() {
+        home_radio_group.setOnCheckedChangeListener { _, checkId ->
+            when (checkId) {
+                // 普通地图
+                R.id.home_rb_normal -> mBaiduMap!!.mapType = BaiduMap.MAP_TYPE_NORMAL
+                // 卫星地图
+                R.id.home_rb_satellite -> mBaiduMap!!.mapType = BaiduMap.MAP_TYPE_SATELLITE
+            }
+        }
     }
 
     override fun onStart() {
@@ -82,6 +112,7 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
         mLocationClient?.unRegisterLocationListener(mBDLocationListener)
         mBaiduMap?.isMyLocationEnabled = false
         home_map_view.onPause()
+
     }
 
     override fun onDestroy() {
@@ -171,13 +202,13 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
         val myLocationConfiguration = MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, bitmapDescriptor)
         mBaiduMap?.setMyLocationConfiguration(myLocationConfiguration)
         val latLng = LatLng(latitude, longitude)
-        val mapStatus = MapStatus.Builder()
+        mMapStatus = MapStatus.Builder()
                 .target(latLng)
                 .zoom(18.0f)
                 .build()
         if (mIsFirst) {
             mIsFirst = false
-            mBaiduMap?.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mapStatus))
+            mBaiduMap?.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mMapStatus))
         }
         val city: String = location.city
         home_toolbar.title = city

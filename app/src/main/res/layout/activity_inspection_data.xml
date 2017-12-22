@@ -193,6 +193,7 @@
             android:background="@drawable/login_edit_text_bg"
             android:gravity="top"
             android:inputType="text"
+            android:padding="@dimen/dp_2_x"
             android:textColor="@color/black"
             tools:ignore="LabelFor"/>
 
@@ -215,6 +216,7 @@
             android:background="@drawable/login_edit_text_bg"
             android:gravity="top"
             android:inputType="text"
+            android:padding="@dimen/dp_2_x"
             android:textColor="@color/black"
             tools:ignore="LabelFor"/>
 
