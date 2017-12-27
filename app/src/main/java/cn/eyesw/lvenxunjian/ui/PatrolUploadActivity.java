@@ -3,16 +3,10 @@ package cn.eyesw.lvenxunjian.ui;
 import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Environment;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
-import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -22,8 +16,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,7 +30,6 @@ import butterknife.OnClick;
 import cn.eyesw.lvenxunjian.R;
 import cn.eyesw.lvenxunjian.base.BaseActivity;
 import cn.eyesw.lvenxunjian.bean.PictureBean;
-import cn.eyesw.lvenxunjian.constant.Constant;
 import cn.eyesw.lvenxunjian.constant.NetworkApi;
 import cn.eyesw.lvenxunjian.utils.BitmapUtil;
 import cn.eyesw.lvenxunjian.utils.OkHttpManager;
@@ -54,16 +46,19 @@ import okhttp3.Call;
  */
 public class PatrolUploadActivity extends BaseActivity {
 
-    private File mOutFile;
-    private Uri mUri;
     private Bitmap mBitmap;
     private OkHttpManager mOkHttpManager;
     private SpUtil mSpUtil;
-    private String mFileName;
     private String mTime;
     /* 经纬度坐标 */
     private String mLongitude;
     private String mLatitude;
+    private String mAddress;
+    // 点击 ImageView 的标志位
+    private int mIndex = 0;
+    // 存储图片的集合
+    private List<Bitmap> mBitmapList;
+    private int mUploadIndex = 0;
 
     @BindView(R.id.upload_toolbar)
     protected Toolbar mToolbar;
@@ -71,8 +66,10 @@ public class PatrolUploadActivity extends BaseActivity {
     protected TextView mTvAddress;
     @BindView(R.id.upload_tv_date)
     protected TextView mTvDate;
-    @BindView(R.id.upload_image_view)
-    protected ImageView mImageView;
+    @BindView(R.id.upload_image_view_left) // 必经点第一张照片
+    protected ImageView mImageViewLeft;
+    @BindView(R.id.upload_image_view_right) // 必经点第二张照片
+    protected ImageView mImageViewRight;
     @BindView(R.id.upload_btn_commit)
     protected Button mBtnCommit;
 
@@ -89,6 +86,7 @@ public class PatrolUploadActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        mBitmapList = new ArrayList<>();
         mOkHttpManager = OkHttpManager.getInstance();
         mSpUtil = SpUtil.getInstance(mContext);
     }
@@ -100,44 +98,22 @@ public class PatrolUploadActivity extends BaseActivity {
         getLatlng();
     }
 
-    @OnClick({R.id.upload_tv_refresh, R.id.upload_image_view, R.id.upload_btn_commit})
+    @OnClick({R.id.upload_tv_refresh, R.id.upload_image_view_left, R.id.upload_image_view_right, R.id.upload_btn_commit})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.upload_tv_refresh:
                 // 获取经纬度坐标
                 getLatlng();
                 break;
-            case R.id.upload_image_view:
-                List<PermissionItem> permissions = new ArrayList<>();
-                permissions.add(new PermissionItem(Manifest.permission.CAMERA, "相机授权", R.drawable.permission_ic_camera));
-                HiPermission.create(this)
-                        .title("授权")
-                        .permissions(permissions)
-                        .animStyle(R.style.PermissionAnimModal)
-                        .filterColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()))
-                        .msg("开启权限")
-                        .checkMutiPermission(new PermissionCallback() {
-                            @Override
-                            public void onClose() {
-                                showToast("相机授权关闭");
-                            }
-
-                            @Override
-                            public void onFinish() {
-                                // 打开相机拍照
-                                openCamera();
-                            }
-
-                            @Override
-                            public void onDeny(String permission, int position) {
-                            }
-
-                            @Override
-                            public void onGuarantee(String permission, int position) {
-                                // 打开相机拍照
-                                openCamera();
-                            }
-                        });
+            case R.id.upload_image_view_left:
+                mIndex = 0;
+                // 申请权限
+                applyPermission();
+                break;
+            case R.id.upload_image_view_right:
+                mIndex = 1;
+                // 申请权限
+                applyPermission();
                 break;
             case R.id.upload_btn_commit:
                 // 上传照片
@@ -149,37 +125,49 @@ public class PatrolUploadActivity extends BaseActivity {
     }
 
     /**
+     * 权限申请
+     */
+    private void applyPermission() {
+        List<PermissionItem> permissions = new ArrayList<>();
+        permissions.add(new PermissionItem(Manifest.permission.CAMERA, "相机授权", R.drawable.permission_ic_camera));
+        permissions.add(new PermissionItem(Manifest.permission.WRITE_EXTERNAL_STORAGE, "写入授权", R.drawable.permission_ic_storage));
+        HiPermission.create(this)
+                .title("授权")
+                .permissions(permissions)
+                .animStyle(R.style.PermissionAnimModal)
+                .filterColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()))
+                .msg("开启权限")
+                .checkMutiPermission(new PermissionCallback() {
+                    @Override
+                    public void onClose() {
+                        showToast("相机授权关闭");
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        // 打开相机拍照
+                        openCamera();
+                    }
+
+                    @Override
+                    public void onDeny(String permission, int position) {
+                    }
+
+                    @Override
+                    public void onGuarantee(String permission, int position) {
+                        // 打开相机拍照
+                        openCamera();
+                    }
+                });
+    }
+
+    /**
      * 打开相机拍照
      */
     private void openCamera() {
-        String state = Environment.getExternalStorageState();
-        if (state.equals(Environment.MEDIA_MOUNTED)) {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-            File outDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-            if (!outDir.exists()) {
-                outDir.mkdirs();
-            }
-            mFileName = System.currentTimeMillis() + ".jpg";
-            mOutFile = new File(outDir, mFileName);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                // 通过 FileProvider 创建一个 content 类型的 Uri
-                mUri = FileProvider.getUriForFile(mContext, "cn.eyesw.lvenxunjian.fileprovider", mOutFile);
-                // 添加这一句表示对目标应用临时授权该 Uri 所代表的文件
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                // 设置 Action 为拍照
-                intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-            } else {
-                mUri = Uri.fromFile(mOutFile);
-            }
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
-            intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-            startActivityForResult(intent, Constant.CAMERA_REQUEST_CODE);
-
-        } else {
-            Toast.makeText(mContext, "请安装内存卡", Toast.LENGTH_SHORT).show();
-        }
+        Intent intent = new Intent(this, WaterMarkerCameraActivity.class);
+        intent.putExtra("address", mAddress);
+        startActivityForResult(intent, 1);
     }
 
     /**
@@ -188,42 +176,59 @@ public class PatrolUploadActivity extends BaseActivity {
     private void uploadPicture() {
         // 上传照片
         if (mBitmap != null) {
-            new Handler().postDelayed(() -> sendPortrait(mBitmap), 1500);
+            new Handler().postDelayed(this::sendPortrait, 1500);
         }
     }
 
     /**
      * 上传照片
-     *
-     * @param bitmap 要上传的照片
      */
-    private void sendPortrait(Bitmap bitmap) {
-        Map<String, String> map = new HashMap<>();
-        String picture = BitmapUtil.convertBitmapToString(bitmap);
-        map.put("file", picture);
-        map.put("task_id", mSpUtil.getString("task_id"));
-        map.put("staff_id", mSpUtil.getString("id"));
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        mTime = format.format(new Date());
-        map.put("photo_time", mTime);
-        map.put("longitude", mLongitude);
-        map.put("latitude", mLatitude);
-        map.put("file_name", mFileName);
-        mOkHttpManager.postAsyncForm(NetworkApi.UPLOAD_TASK_IMG, map, new OkHttpManager.DataCallback() {
+    private void sendPortrait() {
+        new Thread() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                PictureDao pictureDao = new PictureDao(mContext);
-                PictureBean pictureBean = new PictureBean(picture, 0 + "", 0 + "", mTime, mFileName);
-                pictureDao.add(pictureBean);
-            }
+            public void run() {
+                Map<String, String> map;
+                for (int i = 0; i < mBitmapList.size(); i++) {
+                    map = new HashMap<>();
+                    String picture = BitmapUtil.convertBitmapToString(mBitmapList.get(i));
+                    map.put("file", picture);
+                    map.put("task_id", mSpUtil.getString("task_id"));
+                    map.put("staff_id", mSpUtil.getString("id"));
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    mTime = format.format(new Date());
+                    map.put("photo_time", mTime);
+                    map.put("longitude", mLongitude);
+                    map.put("latitude", mLatitude);
+                    map.put("file_name", "1");
+                    mOkHttpManager.postAsyncForm(NetworkApi.UPLOAD_TASK_IMG, map, new OkHttpManager.DataCallback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            PictureDao pictureDao = new PictureDao(mContext);
+                            PictureBean pictureBean = new PictureBean(picture, 0 + "", 0 + "", mTime, "");
+                            pictureDao.add(pictureBean);
+                        }
 
-            @Override
-            public void onResponse(String json) {
-                Toast.makeText(mContext, "上传成功", Toast.LENGTH_SHORT).show();
+                        @Override
+                        public void onResponse(String json) {
+                            mUploadIndex += 1;
+                            if (mUploadIndex == 2) {
+                                for (int j = 0, length = mBitmapList.size(); j < length; j++) {
+                                    Bitmap bitmap = mBitmapList.get(j);
+                                    if (!bitmap.isRecycled()) {
+                                        bitmap.recycle();
+                                    }
+                                }
+                                runOnUiThread(() -> Toast.makeText(mContext, "上传成功", Toast.LENGTH_SHORT).show());
+                            }
+                        }
+                    });
+                }
             }
-        });
+        }.start();
+
         mBtnCommit.setEnabled(false);
-        mImageView.setImageResource(R.drawable.timg);
+        mImageViewLeft.setImageResource(R.drawable.timg);
+        mImageViewRight.setImageResource(R.drawable.timg);
     }
 
     /**
@@ -247,11 +252,11 @@ public class PatrolUploadActivity extends BaseActivity {
                         JSONObject data = object.getJSONObject("data");
                         mLongitude = data.getString("longitude");
                         mLatitude = data.getString("latitude");
-                        String address = data.getString("address");
+                        mAddress = data.getString("address");
                         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         mTime = format.format(new Date());
 
-                        mTvAddress.setText(address);
+                        mTvAddress.setText(mAddress);
                         mTvDate.setText(mTime);
                     }
                 } catch (JSONException e) {
@@ -263,62 +268,28 @@ public class PatrolUploadActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case Constant.CAMERA_REQUEST_CODE:
-                startPhotoZoom(mUri);
-                break;
-            case Constant.CROP_REQUEST_CODE:
-                if (data != null) {
-                    setPicToView(data);
-                }
-                break;
-        }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void startPhotoZoom(Uri data) {
-        if (data == null) {
-            Log.e("TAG", "The uri is not exist.");
-        }
-        Intent intent = new Intent("com.android.camera.action.CROP");
-        intent.setDataAndType(data, "image/*");
-        intent.putExtra("crop", "true");
-
-        if (Build.MODEL.contains("HUAWEI")) {
-            intent.putExtra("aspectX", 9998);
-            intent.putExtra("aspectY", 9999);
-        } else {
-            intent.putExtra("aspectX", 1);
-            intent.putExtra("aspectY", 1);
-        }
-
-        intent.putExtra("outputX", 150);
-        intent.putExtra("outputY", 150);
-        intent.putExtra("scale", true);
-        intent.putExtra("scaleUpIfNeeded", true);
-        intent.putExtra("return-data", true);
-        intent.putExtra("noFaceDetection", true);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivityForResult(intent, Constant.CROP_REQUEST_CODE);
-    }
-
-    private void setPicToView(Intent data) {
-        Bundle extras = data.getExtras();
-        if (extras != null) {
-            mBitmap = extras.getParcelable("data");
-            if (mBitmap != null) {
-                try {
-                    FileOutputStream out = new FileOutputStream(mOutFile);
-                    mBitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
-
-                    out.flush();
-                    out.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+        if (resultCode == 2 && requestCode == 1) {
+            try {
+                String filePath = data.getStringExtra("filePath");
+                FileInputStream fis = new FileInputStream(filePath);
+                mBitmap = BitmapFactory.decodeStream(fis);
+                switch (mIndex) {
+                    case 0:
+                        mImageViewLeft.setImageBitmap(mBitmap);
+                        mBitmapList.add(mBitmap);
+                        break;
+                    case 1:
+                        mImageViewRight.setImageBitmap(mBitmap);
+                        mBitmapList.add(mBitmap);
+                        break;
                 }
+                if (mBitmapList.size() == 2) {
+                    mBtnCommit.setEnabled(true);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            mImageView.setImageBitmap(mBitmap);
-            mBtnCommit.setEnabled(true);
         }
     }
 

@@ -5,8 +5,10 @@ import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.support.v4.content.FileProvider
 import android.text.TextUtils
 import android.view.View
 import android.widget.*
@@ -66,6 +68,8 @@ class DangerDataActivity : BaseActivity() {
     private var mFileName: String? = null
     // 类型 flag
     private var mTypeFlag: String? = null
+    // Image uri
+    private var mImageUri: Uri? = null
 
     override fun getContentLayoutRes(): Int = R.layout.activity_danger_data
 
@@ -471,14 +475,14 @@ class DangerDataActivity : BaseActivity() {
         if (state == Environment.MEDIA_MOUNTED) {
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
-            val outDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            val outDir = Environment.getExternalStorageDirectory()
             if (!outDir.exists()) {
                 outDir.mkdirs()
             }
             mFileName = System.currentTimeMillis().toString() + ".jpg"
             mOutFile = File(outDir, mFileName)
-
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mOutFile))
+            mImageUri = Uri.fromFile(mOutFile)
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri)
             intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1)
             startActivityForResult(intent, Constant.CAMERA_REQUEST_CODE)
 
@@ -490,7 +494,7 @@ class DangerDataActivity : BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            Constant.CAMERA_REQUEST_CODE -> startPhotoZoom(Uri.fromFile(mOutFile))
+            Constant.CAMERA_REQUEST_CODE -> startPhotoZoom(mImageUri)
             Constant.ALBUM_REQUEST_CODE -> {
                 if (data == null || data.data == null) {
                     return
@@ -519,6 +523,7 @@ class DangerDataActivity : BaseActivity() {
         intent.putExtra("scaleUpIfNeeded", true)
         intent.putExtra("return-data", true)
         intent.putExtra("noFaceDetection", true)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivityForResult(intent, Constant.CROP_REQUEST_CODE)
     }
 

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cn.eyesw.lvenxunjian">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="cn.eyesw.lvenxunjian">
 
     <!-- 打电话权限 -->
     <uses-permission android:name="android.permission.CALL_PHONE"/>
@@ -117,6 +116,9 @@
         <activity
             android:name=".ui.MyMessageActivity"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.WaterMarkerCameraActivity"
+            android:screenOrientation="portrait"/>
 
         <!-- 管理员界面 -->
         <activity
@@ -175,7 +177,7 @@
             <!-- 元数据 -->
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
+                android:resource="@xml/file_path"/>
         </provider>
 
     </application>

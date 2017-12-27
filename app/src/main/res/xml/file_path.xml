@@ -4,7 +4,7 @@
     <paths>
         <external-path
             name="image"
-            path="Pictures"/>
+            path=""/>
         <external-path
             name="apk"
             path="Download"/>
