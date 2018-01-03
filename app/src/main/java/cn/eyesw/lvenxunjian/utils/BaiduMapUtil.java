@@ -4,8 +4,6 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.map.BaiduMap;
 
-import java.io.FileOutputStream;
-
 public class BaiduMapUtil {
 
     public static void initLocation(LocationClient locationClient, BaiduMap baiduMap) {

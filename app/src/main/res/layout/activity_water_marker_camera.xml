@@ -17,7 +17,9 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="@dimen/dp_25_y"
-        android:layout_marginRight="@dimen/dp_50_x"/>
+        android:layout_marginRight="@dimen/dp_50_x"
+        android:src="@drawable/camera_check"
+        tools:ignore="RelativeOverlap"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/camera_fab_close"
@@ -25,7 +27,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="@dimen/dp_25_y"
-        android:layout_marginLeft="@dimen/dp_50_x"/>
+        android:layout_marginLeft="@dimen/dp_50_x"
+        android:src="@drawable/camera_close"/>
 
     <TextView
         android:id="@+id/camera_tv_time"
@@ -33,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/dp_20_x"
         android:layout_marginTop="@dimen/dp_20_y"
-        android:textColor="#fcfcfc"
+        android:textColor="#FFFFFF"
         android:textSize="20sp"
         tools:text="2017-12-26 13:00:00"/>
 
@@ -43,7 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/dp_20_x"
         android:layout_marginTop="@dimen/dp_70_y"
-        android:textColor="#fcfcfc"
+        android:textColor="#FFFFFF"
         android:textSize="20sp"
         tools:text="山东省烟台市绍兴路"/>
 

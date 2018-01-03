@@ -27,7 +27,7 @@ public class NetWorkReceiver extends BroadcastReceiver {
 
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isConnected()) {
-                PictureDao pictureDao = new PictureDao(context);
+                PictureDao pictureDao = new PictureDao();
                 List<PictureBean> list = pictureDao.query();
                 Intent service = new Intent(context, UploadPictureService.class);
                 if (list != null && list.size() > 0) {

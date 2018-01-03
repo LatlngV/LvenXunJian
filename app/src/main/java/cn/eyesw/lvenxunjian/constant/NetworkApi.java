@@ -70,4 +70,7 @@ public class NetworkApi {
     // 巡线员必经点
     public static final String STAFF_POINT = BASE_URI + "/get_part_point_by_staff";
 
+    // 巡检任务
+    public static final String TASK = BASE_URI + "/tasks";
+
 }

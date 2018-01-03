@@ -8,18 +8,30 @@ import android.support.v7.app.AlertDialog
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.widget.*
+import cn.eyesw.greendao.DaoSession
+import cn.eyesw.greendao.PipelineBeanDao
+import cn.eyesw.greendao.PipelinePointBeanDao
 import cn.eyesw.lvenxunjian.base.BaseActivity
+import cn.eyesw.lvenxunjian.bean.PipelineBean
+import cn.eyesw.lvenxunjian.bean.PipelinePointBean
 import cn.eyesw.lvenxunjian.constant.Constant
 import cn.eyesw.lvenxunjian.ui.*
 import cn.eyesw.lvenxunjian.utils.BaiduMapUtil
+import cn.eyesw.lvenxunjian.utils.NetWorkUtil
 import cn.eyesw.lvenxunjian.utils.SpUtil
 import cn.eyesw.lvenxunjian.utils.UpdateManager
 import com.baidu.location.BDLocationListener
 import com.baidu.location.LocationClient
 import com.baidu.mapapi.map.*
 import com.baidu.mapapi.model.LatLng
+import com.baidu.mapapi.utils.CoordinateConverter
 import kotlinx.android.synthetic.main.activity_home.*
 import me.weyye.hipermission.PermissionItem
+import okhttp3.ResponseBody
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.ArrayList
 
 /**
@@ -27,16 +39,32 @@ import java.util.ArrayList
  */
 class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
 
+    private var mSpUtil: SpUtil? = null
+    private var mLocationClient: LocationClient? = null
     // 百度地图实例
     private var mBaiduMap: BaiduMap? = null
-    private var mLocationClient: LocationClient? = null
-    private var mSpUtil: SpUtil? = null
     // 是不是第一次定位
     private var mIsFirst = true
     // 记录按下返回键的时间
     private var startTime: Long = 0
     // 地图状态
     private var mMapStatus: MapStatus? = null
+    //
+    private var mPipelineBean: PipelineBean? = null
+    // 存储管线的实体类
+    private var mPipelinePointBean: PipelinePointBean? = null
+    // 纬度坐标
+    private var mLatitude: Double = 0.0
+    // 经度坐标
+    private var mLongitude: Double = 0.0
+    // 经纬度坐标实体类
+    private var mLatLng: LatLng? = null
+    // 操作管道数据实体类的 dao
+    private var mPipelinePointBeanDao: PipelinePointBeanDao? = null
+    //
+    private var mPipelineBeanDao: PipelineBeanDao? = null
+    //
+    private var mDaoSession: DaoSession? = null
 
     override fun getContentLayoutRes(): Int = R.layout.activity_home
 
@@ -47,6 +75,7 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
     }
 
     override fun initView() {
+        mDaoSession = LvenXunJianApplication.getDaoSession()
         mSpUtil = SpUtil.getInstance(mContext)
         // 百度地图实例
         mBaiduMap = home_map_view.map
@@ -64,6 +93,122 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
 
         /* 定位 */
         setLocation()
+
+        /* 画管线 */
+        drawPipeline()
+    }
+
+    /**
+     * 画管线
+     */
+    private fun drawPipeline() {
+        mPipelineBeanDao = mDaoSession!!.pipelineBeanDao
+
+        val pipelineBeanList = mPipelineBeanDao!!.loadAll()
+        if (pipelineBeanList.size > 0) { // 从数据库里读取数据
+            // 画管线
+            drawAllPipeline(pipelineBeanList)
+        } else {
+        // 请求管线数据
+        requestPipelinePoint()
+        }
+    }
+
+    /**
+     * 画所有的管线
+     */
+    private fun drawAllPipeline(pipelineBeanList: List<PipelineBean>) {
+        mPipelinePointBeanDao = mDaoSession!!.pipelinePointBeanDao
+        val pointList = mPipelinePointBeanDao!!.loadAll()
+        for (i in pipelineBeanList.indices) {
+            val points = ArrayList<LatLng>()
+            mPipelineBean = pipelineBeanList[i]
+            val id = mPipelineBean!!.id
+
+            for (j in pointList.indices) {
+                mPipelinePointBean = pointList[i]
+                if (mPipelinePointBean!!.pipelineId == id) {
+                    mLatLng = LatLng(mPipelinePointBean!!.latitude, mPipelinePointBean!!.longitude)
+                    points.add(mLatLng!!)
+                }
+            }
+
+            //绘制折线
+            val ooPolyline = PolylineOptions().width(10).color(0xAA0000FF.toInt()).points(points)
+            mBaiduMap?.addOverlay(ooPolyline)
+        }
+    }
+
+    /**
+     * 请求管线数据
+     */
+    private fun requestPipelinePoint() {
+        val apiService = NetWorkUtil.getInstance().apiService
+        val allPipeline = apiService.allPipeline()
+        allPipeline.enqueue(object : Callback<ResponseBody> {
+            override fun onFailure(call: Call<ResponseBody>?, t: Throwable?) {
+                showToast(getString(R.string.network_error))
+            }
+
+            override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
+                val json = String(response?.body()!!.bytes())
+                // 解析 json
+                analysisJson(json)
+            }
+        })
+    }
+
+    /**
+     * 解析 json 数据
+     */
+    private fun analysisJson(json: String) {
+        val jsonObject = JSONObject(json)
+        val code = jsonObject.getInt("code")
+        if (code == 200) {
+            val converter = CoordinateConverter()
+            var convert: LatLng
+
+            converter.from(CoordinateConverter.CoordType.COMMON)
+            val jsonArray = jsonObject.getJSONArray("lines")
+            for (i in 0 until jsonArray.length()) {
+                val obj = jsonArray.get(i) as JSONObject
+                val array = obj.getJSONArray("line_parts")
+
+                // 插入到数据库中
+//                mPipelineBean = PipelineBean()
+//                mPipelineBean!!.name = "固定的"
+//                mPipelineBeanDao?.insert(mPipelineBean)
+
+                for (j in 0 until array.length()) {
+                    val points = ArrayList<LatLng>()
+                    val linePart = array.get(j) as JSONObject
+                    val positionArray = linePart.getJSONArray("positions")
+
+                    for (k in 0 until positionArray.length()) {
+                        val position = positionArray.get(k) as JSONObject
+                        mLatitude = position.getString("latitude").toDouble()
+                        mLongitude = position.getString("longitude").toDouble()
+                        mLatLng = LatLng(mLatitude, mLongitude)
+
+                        // LatLng 待转换坐标
+                        converter.coord(mLatLng)
+                        convert = converter.convert()
+
+                        // 将 LatLng 对象添加到集合中, 这是转换后的坐标(大地坐标系 --> 百度坐标系)
+                        points.add(convert)
+
+                        // 将转换后的坐标插入到数据库中
+//                        mPipelinePointBean = PipelinePointBean(convert.latitude, convert.longitude, mPipelineBean!!.id)
+//                        mPipelinePointBeanDao!!.insert(mPipelinePointBean)
+                    }
+
+                    //绘制折线
+                    val ooPolyline = PolylineOptions().width(10).color(0xAA0000FF.toInt()).points(points)
+                    mBaiduMap?.addOverlay(ooPolyline)
+                }
+
+            }
+        }
     }
 
     /**
@@ -82,9 +227,9 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
     private fun setMapType() {
         home_radio_group.setOnCheckedChangeListener { _, checkId ->
             when (checkId) {
-                // 普通地图
+            // 普通地图
                 R.id.home_rb_normal -> mBaiduMap!!.mapType = BaiduMap.MAP_TYPE_NORMAL
-                // 卫星地图
+            // 卫星地图
                 R.id.home_rb_satellite -> mBaiduMap!!.mapType = BaiduMap.MAP_TYPE_SATELLITE
             }
         }

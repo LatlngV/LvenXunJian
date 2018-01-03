@@ -7,7 +7,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -50,7 +49,6 @@ class StaffDataActivity : BaseActivity() {
 
     override fun initView() {
         mDid = intent.getStringExtra("did")
-        Log.d("tag", "did == $mDid")
         val ctime = intent.getStringExtra("ctime")
         val staffName = intent.getStringExtra("staff_name")
         val dnote = intent.getStringExtra("dnote")
@@ -127,9 +125,9 @@ class StaffDataActivity : BaseActivity() {
     }
 
     private fun uploadData() {
-        val note = staff_data_tv_danger_des.text.toString()
-        mApiService?.saveRepairCheck(mDid, note)
-        mApiService?.equals(object : Callback<ResponseBody> {
+        val note = urgent_tv_des.text.toString()
+        val saveRepairCheck = mApiService?.saveRepairCheck(mDid.toString(), note)
+        saveRepairCheck?.enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
                 val json = String(response?.body()?.bytes()!!)
                 val obj = JSONObject(json)
@@ -298,7 +296,6 @@ class StaffDataActivity : BaseActivity() {
         repairPhoto?.enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
                 val json = String(response?.body()?.bytes()!!)
-                Log.d("tag", json)
                 val jsonObject = JSONObject(json)
                 val code = jsonObject.getInt("code")
                 if (code == 200) {

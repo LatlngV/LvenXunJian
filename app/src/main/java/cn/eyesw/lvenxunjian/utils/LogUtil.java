@@ -2,10 +2,6 @@ package cn.eyesw.lvenxunjian.utils;
 
 import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  * 日志工具类，采用构建者模式
  */

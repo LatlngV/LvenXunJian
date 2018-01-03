@@ -85,7 +85,7 @@ public interface ApiService {
     Call<ResponseBody> repairPhoto(@Field("weixiu_id") String dataId);
 
     /**
-     *
+     * 维修后数据
      */
     @FormUrlEncoded
     @POST("save_weixiu_check")
@@ -94,5 +94,11 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("upload_weixiu_check_img")
     Call<ResponseBody> uploadRepairImg(@Field("weixiu_data_id") String dataId, @Field("file") String file, @Field("file_name") String fileName);
+
+    /**
+     * 所有的管道数据
+     */
+    @GET("line_position")
+    Call<ResponseBody> allPipeline();
 
 }

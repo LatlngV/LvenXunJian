@@ -157,6 +157,7 @@ public class LoginActivity extends BaseActivity {
             JSONObject obj = new JSONObject(json);
             int code = obj.getInt("code");
             if (code == 200) {
+                mProgressDialog.dismiss();
                 JSONObject userInfo = obj.getJSONObject("data").getJSONObject("user_info");
                 String id = userInfo.getString("id");
                 String staffNum = userInfo.getString("staff_num");
@@ -181,7 +182,6 @@ public class LoginActivity extends BaseActivity {
                     intent = new Intent(LoginActivity.this, HomeActivity.class);
                 }
                 startActivity(intent);
-                mProgressDialog.dismiss();
                 finish();
 
             } else if (code == 400) {

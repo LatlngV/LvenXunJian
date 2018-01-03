@@ -151,7 +151,9 @@
                 android:background="@drawable/alarm_text_view_bg"
                 android:cursorVisible="false"
                 android:gravity="left|top"
-                android:paddingLeft="@dimen/dp_3_x"/>
+                android:paddingLeft="@dimen/dp_3_x"
+                android:inputType="text"
+                tools:ignore="LabelFor"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -170,7 +172,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    tools:ignore="UselessParent">
 
                     <ImageView
                         android:id="@+id/hidden_iv_first_take_photo"

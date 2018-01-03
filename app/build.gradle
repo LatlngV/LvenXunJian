@@ -23,7 +23,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -56,8 +56,8 @@ dependencies {
     compile files('libs/BaiduLBS_Android.jar')
     compile "com.android.support:appcompat-v7:$sdk_version"
     // 解绑 findViewById 和 onClick 事件
-    compile 'com.jakewharton:butterknife:8.5.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    compile "com.jakewharton:butterknife:$butterknife_version"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$butterknife_version"
     compile "com.android.support:design:$sdk_version"
     // 网络请求框架
     compile 'com.squareup.okhttp3:okhttp:3.9.0'

@@ -2,7 +2,6 @@ package cn.eyesw.lvenxunjian.ui
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -10,14 +9,8 @@ import cn.eyesw.lvenxunjian.R
 import cn.eyesw.lvenxunjian.base.BaseActivity
 import cn.eyesw.lvenxunjian.base.BaseListViewAdapter
 import cn.eyesw.lvenxunjian.bean.DataCollectionEntity
-import cn.eyesw.lvenxunjian.utils.NetWorkUtil
-import cn.eyesw.lvenxunjian.utils.SpUtil
 import cn.eyesw.lvenxunjian.utils.ToolbarUtil
 import kotlinx.android.synthetic.main.activity_data_collection.*
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 /**
  * 数据采集

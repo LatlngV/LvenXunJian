@@ -26,7 +26,7 @@
         <RadioGroup
             android:id="@+id/home_radio_group"
             android:layout_width="wrap_content"
-            android:layout_height="20dp"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/home_toolbar"
             android:layout_margin="@dimen/dp_5_x"
             android:background="#eee"
@@ -38,6 +38,7 @@
                 android:layout_height="wrap_content"
                 android:button="@null"
                 android:checked="true"
+                android:padding="5dp"
                 android:text="普通地图"
                 android:textColor="@color/select_radio_button"/>
 
@@ -53,6 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:button="@null"
+                android:padding="5dp"
                 android:text="卫星地图"
                 android:textColor="@color/select_radio_button"/>
 
@@ -60,15 +62,17 @@
 
         <TextView
             android:id="@+id/home_tv_location"
-            android:layout_width="wrap_content"
+            android:layout_width="55dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/home_toolbar"
             android:layout_marginRight="@dimen/dp_5_x"
-            android:layout_marginTop="@dimen/dp_3_y"
+            android:layout_marginTop="@dimen/dp_5_y"
             android:background="#eee"
+            android:gravity="center"
             android:padding="@dimen/dp_5_x"
-            android:text="定位"/>
+            android:text="定位"
+            android:textColor="@color/black"/>
 
     </RelativeLayout>
 

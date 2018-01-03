@@ -38,7 +38,7 @@ public class UploadPictureService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        PictureDao pictureDao = new PictureDao(this);
+        PictureDao pictureDao = new PictureDao();
         List<PictureBean> list = pictureDao.query();
         if (list != null && list.size() > 0) {
             for (int i = 0; i < list.size(); i++) {

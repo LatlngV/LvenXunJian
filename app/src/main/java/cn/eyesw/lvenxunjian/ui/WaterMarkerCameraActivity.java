@@ -28,12 +28,18 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import cn.eyesw.lvenxunjian.R;
 import cn.eyesw.lvenxunjian.base.BaseActivity;
+import cn.eyesw.lvenxunjian.utils.DensityUtil;
 
+/**
+ * 水印相机
+ */
 public class WaterMarkerCameraActivity extends BaseActivity implements SurfaceHolder.Callback {
 
     private Camera mCamera;
     private SurfaceHolder mHolder;
     private Display mDisplay;
+    private String mAddress;
+    private String mTime;
 
     @BindView(R.id.camera_surface_view)
     protected SurfaceView mSurfaceView;
@@ -41,8 +47,6 @@ public class WaterMarkerCameraActivity extends BaseActivity implements SurfaceHo
     protected TextView mTvTime;
     @BindView(R.id.camera_tv_address)
     protected TextView mTvAddress;
-    private String mAddress;
-    private String mTime;
 
     @Override
     protected int getContentLayoutRes() {
@@ -142,9 +146,7 @@ public class WaterMarkerCameraActivity extends BaseActivity implements SurfaceHo
             case R.id.camera_fab_check:
                 // 设置照片参数
                 setPictureParameters();
-                mCamera.autoFocus((b, camera) -> {
-                    mCamera.takePicture(null, null, mPictureCallback);
-                });
+                mCamera.autoFocus((b, camera) -> mCamera.takePicture(null, null, mPictureCallback));
                 break;
         }
     }
@@ -154,10 +156,10 @@ public class WaterMarkerCameraActivity extends BaseActivity implements SurfaceHo
      */
     private void setPictureParameters() {
         Camera.Parameters parameters = mCamera.getParameters();
+        // 设置照片格式
         parameters.setPictureFormat(ImageFormat.JPEG);
+        // 设置照片质量
         parameters.setJpegQuality(80);
-//        parameters.setPictureSize(1024, 768);
-
 
         List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
         int maxSize = Math.max(mDisplay.getWidth(), mDisplay.getHeight());
@@ -184,7 +186,8 @@ public class WaterMarkerCameraActivity extends BaseActivity implements SurfaceHo
             }
         }
 
-        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+        // 实时聚焦
+        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
         mCamera.setParameters(parameters);
     }
 
@@ -196,14 +199,17 @@ public class WaterMarkerCameraActivity extends BaseActivity implements SurfaceHo
             matrix.setRotate(90);
             bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
             // 添加水印
-            bitmap = waterMarkerBitmap(bitmap);
+//            bitmap = waterMarkerBitmap(bitmap);
             String pictureName = System.currentTimeMillis() + ".jpg";
             File picture = new File(pictures, pictureName);
             FileOutputStream fos = new FileOutputStream(picture);
             if (bitmap != null) {
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fos);
             }
+            fos.flush();
             fos.close();
+            // 释放内存
+            bitmap.recycle();
 
             Intent intent = new Intent();
             intent.putExtra("filePath", picture.getAbsolutePath());
@@ -221,15 +227,17 @@ public class WaterMarkerCameraActivity extends BaseActivity implements SurfaceHo
      * @return 返回带水印的图片
      */
     private Bitmap waterMarkerBitmap(Bitmap bitmap) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
         Paint paint = new Paint();
-        paint.setTextSize(100);
-        paint.setColor(Color.parseColor("#fcfcfc"));
+        paint.setTextSize(DensityUtil.dip2px(mContext, 80));
+        paint.setColor(Color.parseColor("#FFFFFF"));
         paint.setStyle(Paint.Style.FILL);
         Canvas canvas = new Canvas(bitmap);
         // 画文字(时间)
-        canvas.drawText(mTime, 50, 100, paint);
+        canvas.drawText(mTime, width / 5, height / 3, paint);
         // 画文字(地点)
-        canvas.drawText(mAddress, 50, 500, paint);
+        canvas.drawText(mAddress, width / 5, height / 3 * 2, paint);
         canvas.save(Canvas.ALL_SAVE_FLAG);
         canvas.restore();
         return bitmap;
