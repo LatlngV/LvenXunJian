@@ -103,14 +103,15 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
      */
     private fun drawPipeline() {
         mPipelineBeanDao = mDaoSession!!.pipelineBeanDao
+        mPipelinePointBeanDao = mDaoSession!!.pipelinePointBeanDao
 
         val pipelineBeanList = mPipelineBeanDao!!.loadAll()
         if (pipelineBeanList.size > 0) { // 从数据库里读取数据
             // 画管线
             drawAllPipeline(pipelineBeanList)
         } else {
-        // 请求管线数据
-        requestPipelinePoint()
+            // 请求管线数据
+            requestPipelinePoint()
         }
     }
 
@@ -118,19 +119,15 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
      * 画所有的管线
      */
     private fun drawAllPipeline(pipelineBeanList: List<PipelineBean>) {
-        mPipelinePointBeanDao = mDaoSession!!.pipelinePointBeanDao
-        val pointList = mPipelinePointBeanDao!!.loadAll()
         for (i in pipelineBeanList.indices) {
             val points = ArrayList<LatLng>()
             mPipelineBean = pipelineBeanList[i]
-            val id = mPipelineBean!!.id
+            val pipelinePointBeanList = mPipelineBean!!.pipelinePointBeanList
 
-            for (j in pointList.indices) {
-                mPipelinePointBean = pointList[i]
-                if (mPipelinePointBean!!.pipelineId == id) {
-                    mLatLng = LatLng(mPipelinePointBean!!.latitude, mPipelinePointBean!!.longitude)
-                    points.add(mLatLng!!)
-                }
+            for (j in pipelinePointBeanList.indices) {
+                mPipelinePointBean = pipelinePointBeanList[j]
+                mLatLng = LatLng(mPipelinePointBean!!.latitude, mPipelinePointBean!!.longitude)
+                points.add(mLatLng!!)
             }
 
             //绘制折线
@@ -170,44 +167,53 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
 
             converter.from(CoordinateConverter.CoordType.COMMON)
             val jsonArray = jsonObject.getJSONArray("lines")
-            for (i in 0 until jsonArray.length()) {
-                val obj = jsonArray.get(i) as JSONObject
-                val array = obj.getJSONArray("line_parts")
+            (0 until jsonArray.length())
+                    .asSequence()
+                    .map { jsonArray.get(it) as JSONObject }
+                    .map { it.getJSONArray("line_parts") }
+                    .forEach {
 
-                // 插入到数据库中
-//                mPipelineBean = PipelineBean()
-//                mPipelineBean!!.name = "固定的"
-//                mPipelineBeanDao?.insert(mPipelineBean)
+                        /* 数据量太大，开启子线程，防止 ANR */
+                        object : Thread() {
+                            override fun run() {
+                                for (j in 0 until it.length()) {
+                                    val points = ArrayList<LatLng>()
+                                    val linePart = it.get(j) as JSONObject
+                                    val positionArray = linePart.getJSONArray("positions")
 
-                for (j in 0 until array.length()) {
-                    val points = ArrayList<LatLng>()
-                    val linePart = array.get(j) as JSONObject
-                    val positionArray = linePart.getJSONArray("positions")
+                                    // 插入到数据库中
+                                    mPipelineBean = PipelineBean()
+                                    mPipelineBean!!.id = (j + 1).toLong()
+                                    mPipelineBean!!.name = "固定的"
+                                    mPipelineBeanDao?.insert(mPipelineBean)
 
-                    for (k in 0 until positionArray.length()) {
-                        val position = positionArray.get(k) as JSONObject
-                        mLatitude = position.getString("latitude").toDouble()
-                        mLongitude = position.getString("longitude").toDouble()
-                        mLatLng = LatLng(mLatitude, mLongitude)
+                                    for (k in 0 until positionArray.length()) {
+                                        val position = positionArray.get(k) as JSONObject
+                                        mLatitude = position.getString("latitude").toDouble()
+                                        mLongitude = position.getString("longitude").toDouble()
+                                        mLatLng = LatLng(mLatitude, mLongitude)
 
-                        // LatLng 待转换坐标
-                        converter.coord(mLatLng)
-                        convert = converter.convert()
+                                        // LatLng 待转换坐标
+                                        converter.coord(mLatLng)
+                                        convert = converter.convert()
 
-                        // 将 LatLng 对象添加到集合中, 这是转换后的坐标(大地坐标系 --> 百度坐标系)
-                        points.add(convert)
+                                        // 将 LatLng 对象添加到集合中, 这是转换后的坐标(大地坐标系 --> 百度坐标系)
+                                        points.add(convert)
 
-                        // 将转换后的坐标插入到数据库中
-//                        mPipelinePointBean = PipelinePointBean(convert.latitude, convert.longitude, mPipelineBean!!.id)
-//                        mPipelinePointBeanDao!!.insert(mPipelinePointBean)
+                                        // 将转换后的坐标插入到数据库中
+                                        mPipelinePointBean = PipelinePointBean(convert.latitude, convert.longitude, mPipelineBean!!.id)
+                                        mPipelinePointBeanDao!!.insert(mPipelinePointBean)
+                                    }
+
+                                    runOnUiThread {
+                                        //绘制折线
+                                        val ooPolyline = PolylineOptions().width(10).color(0xAA0000FF.toInt()).points(points)
+                                        mBaiduMap?.addOverlay(ooPolyline)
+                                    }
+                                }
+                            }
+                        }.start()
                     }
-
-                    //绘制折线
-                    val ooPolyline = PolylineOptions().width(10).color(0xAA0000FF.toInt()).points(points)
-                    mBaiduMap?.addOverlay(ooPolyline)
-                }
-
-            }
         }
     }
 
@@ -238,12 +244,14 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
     override fun onStart() {
         super.onStart()
         mLocationClient = LocationClient(mContext)
-        mLocationClient?.registerLocationListener(mBDLocationListener)
 
         // 授权
         val permissions = ArrayList<PermissionItem>()
         permissions.add(PermissionItem(Manifest.permission.ACCESS_FINE_LOCATION, "精确位置", R.drawable.permission_ic_location))
-        permission(permissions) { BaiduMapUtil.initLocation(mLocationClient, mBaiduMap) }
+        permission(permissions) {
+            mLocationClient?.registerLocationListener(mBDLocationListener)
+            BaiduMapUtil.initLocation(mLocationClient, mBaiduMap)
+        }
     }
 
     override fun onResume() {

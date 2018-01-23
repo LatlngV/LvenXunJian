@@ -11,7 +11,6 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,10 +56,6 @@ public class LoginActivity extends BaseActivity {
     protected EditText mEtPhoneNumber;
     @BindView(R.id.login_et_password)
     protected EditText mEtPassword;
-    @BindView(R.id.login_ll_container)
-    protected LinearLayout mLlContainer;
-    @BindView(R.id.login_tv_title)
-    protected TextView mTvTitle;
 
     @Override
     protected int getContentLayoutRes() {

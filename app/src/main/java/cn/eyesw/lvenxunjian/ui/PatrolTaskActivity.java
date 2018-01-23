@@ -278,6 +278,8 @@ public class PatrolTaskActivity extends BaseActivity {
                             startService(mService);
                             // 注册广播
                             registerBroadcastReceiver();
+                            // 获取必经点的集合
+                            getStaffPointState();
                         }
                         // 获取必经点的集合
                         getStaffPointState();
@@ -609,8 +611,9 @@ public class PatrolTaskActivity extends BaseActivity {
      */
     @OnClick(R.id.patrol_task_btn_start)
     public void onClick() {
+
         if (mFlag) {
-            if (mPositions.length() == 0) {
+            if (mPositions == null) {
                 Dialog dialog = new Dialog(this);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 View view = View.inflate(mContext, R.layout.dialog_patrol_task, null);
@@ -644,6 +647,12 @@ public class PatrolTaskActivity extends BaseActivity {
             mTvTimer.setText("00:00:00");
         }
         isSign();
+    }
+
+    @OnClick(R.id.patrol_task_patrol_upload)
+    public void patrolUpload() {
+        Intent intent = new Intent(this, PatrolUploadActivity.class);
+        startActivity(intent);
     }
 
     /**

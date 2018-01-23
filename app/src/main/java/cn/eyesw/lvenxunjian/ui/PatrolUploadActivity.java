@@ -236,6 +236,8 @@ public class PatrolUploadActivity extends BaseActivity {
                     PictureDao pictureDao = new PictureDao();
                     PictureBean pictureBean = new PictureBean(picture, 0 + "", 0 + "", mTime, "");
                     pictureDao.add(pictureBean);
+                    // 上传失败隐藏 ProgressDialog
+                    mProgressDialog.dismiss();
                 }
 
                 @Override

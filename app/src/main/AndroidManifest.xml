@@ -152,11 +152,13 @@
             android:name=".ui.StaffDataActivity"
             android:screenOrientation="portrait"/>
 
+        <!--
         <receiver android:name=".receiver.NetWorkReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
             </intent-filter>
         </receiver>
+        -->
 
         <service
             android:name=".service.UploadPictureService"
@@ -168,17 +170,17 @@
             android:exported="true"/>
 
         <!-- Android 7.0 问题 -->
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="cn.eyesw.lvenxunjian.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
+        <!--<provider-->
+            <!--android:name="android.support.v4.content.FileProvider"-->
+            <!--android:authorities="cn.eyesw.lvenxunjian.fileprovider"-->
+            <!--android:exported="false"-->
+            <!--android:grantUriPermissions="true">-->
 
-            <!-- 元数据 -->
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_path"/>
-        </provider>
+            <!--&lt;!&ndash; 元数据 &ndash;&gt;-->
+            <!--<meta-data-->
+                <!--android:name="android.support.FILE_PROVIDER_PATHS"-->
+                <!--android:resource="@xml/file_path"/>-->
+        <!--</provider>-->
 
     </application>
 
