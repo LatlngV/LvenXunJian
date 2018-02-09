@@ -9,10 +9,12 @@ import org.greenrobot.greendao.identityscope.IdentityScopeType;
 import org.greenrobot.greendao.internal.DaoConfig;
 
 import cn.eyesw.lvenxunjian.bean.LatlngEntity;
+import cn.eyesw.lvenxunjian.bean.PhotoBean;
 import cn.eyesw.lvenxunjian.bean.PipelineBean;
 import cn.eyesw.lvenxunjian.bean.PipelinePointBean;
 
 import cn.eyesw.greendao.LatlngEntityDao;
+import cn.eyesw.greendao.PhotoBeanDao;
 import cn.eyesw.greendao.PipelineBeanDao;
 import cn.eyesw.greendao.PipelinePointBeanDao;
 
@@ -26,10 +28,12 @@ import cn.eyesw.greendao.PipelinePointBeanDao;
 public class DaoSession extends AbstractDaoSession {
 
     private final DaoConfig latlngEntityDaoConfig;
+    private final DaoConfig photoBeanDaoConfig;
     private final DaoConfig pipelineBeanDaoConfig;
     private final DaoConfig pipelinePointBeanDaoConfig;
 
     private final LatlngEntityDao latlngEntityDao;
+    private final PhotoBeanDao photoBeanDao;
     private final PipelineBeanDao pipelineBeanDao;
     private final PipelinePointBeanDao pipelinePointBeanDao;
 
@@ -40,6 +44,9 @@ public class DaoSession extends AbstractDaoSession {
         latlngEntityDaoConfig = daoConfigMap.get(LatlngEntityDao.class).clone();
         latlngEntityDaoConfig.initIdentityScope(type);
 
+        photoBeanDaoConfig = daoConfigMap.get(PhotoBeanDao.class).clone();
+        photoBeanDaoConfig.initIdentityScope(type);
+
         pipelineBeanDaoConfig = daoConfigMap.get(PipelineBeanDao.class).clone();
         pipelineBeanDaoConfig.initIdentityScope(type);
 
@@ -47,22 +54,29 @@ public class DaoSession extends AbstractDaoSession {
         pipelinePointBeanDaoConfig.initIdentityScope(type);
 
         latlngEntityDao = new LatlngEntityDao(latlngEntityDaoConfig, this);
+        photoBeanDao = new PhotoBeanDao(photoBeanDaoConfig, this);
         pipelineBeanDao = new PipelineBeanDao(pipelineBeanDaoConfig, this);
         pipelinePointBeanDao = new PipelinePointBeanDao(pipelinePointBeanDaoConfig, this);
 
         registerDao(LatlngEntity.class, latlngEntityDao);
+        registerDao(PhotoBean.class, photoBeanDao);
         registerDao(PipelineBean.class, pipelineBeanDao);
         registerDao(PipelinePointBean.class, pipelinePointBeanDao);
     }
     
     public void clear() {
         latlngEntityDaoConfig.clearIdentityScope();
+        photoBeanDaoConfig.clearIdentityScope();
         pipelineBeanDaoConfig.clearIdentityScope();
         pipelinePointBeanDaoConfig.clearIdentityScope();
     }
 
     public LatlngEntityDao getLatlngEntityDao() {
         return latlngEntityDao;
+    }
+
+    public PhotoBeanDao getPhotoBeanDao() {
+        return photoBeanDao;
     }
 
     public PipelineBeanDao getPipelineBeanDao() {

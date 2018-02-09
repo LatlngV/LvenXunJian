@@ -1,12 +1,13 @@
 package cn.eyesw.lvenxunjian.ui;
 
 import android.content.Context;
+import android.os.Environment;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +43,7 @@ public class SettingActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        String[] content = new String[]{"用户资料", "清理缓存"};
+        String[] content = new String[]{"用户资料", "清理图片"};
         List<String> list = new ArrayList<>();
         Collections.addAll(list, content);
 
@@ -56,11 +57,35 @@ public class SettingActivity extends BaseActivity {
                 startActivity(UserActivity.class);
                 break;
             case 1:
-                Toast.makeText(mContext, "清理成功", Toast.LENGTH_SHORT).show();
+                // 递归删除文件
+                File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                File[] files = directory.listFiles();
+                new Thread() {
+                    @Override
+                    public void run() {
+                        deletePhotoFile(files);
+                    }
+                }.start();
                 break;
             default:
                 throw new RuntimeException(getString(R.string.unkown_error));
         }
+    }
+
+    /**
+     * 删除图片文件
+     *
+     * @param files 文件数组
+     */
+    private void deletePhotoFile(File[] files) {
+        for (File file : files) {
+            if (file.isFile()) {
+                file.delete();
+            } else {
+                deletePhotoFile(file.listFiles());
+            }
+        }
+        runOnUiThread(() -> showToast("清理成功"));
     }
 
     private class SettingAdapter extends BaseListViewAdapter<String> {

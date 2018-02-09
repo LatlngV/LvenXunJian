@@ -16,24 +16,31 @@ public class PipelinePointBean {
         this.longitude = longitude;
         this.pipelineId = pipelineId;
     }
+
     @Generated(hash = 152620428)
     public PipelinePointBean() {
     }
+
     public double getLatitude() {
         return this.latitude;
     }
+
     public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
+
     public double getLongitude() {
         return this.longitude;
     }
+
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
+
     public long getPipelineId() {
         return this.pipelineId;
     }
+
     public void setPipelineId(long pipelineId) {
         this.pipelineId = pipelineId;
     }

@@ -1,6 +1,7 @@
 package cn.eyesw.lvenxunjian.utils;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -18,8 +19,8 @@ public class PictureDao {
 
     private DBHelper mDBHelper;
 
-    public PictureDao() {
-        mDBHelper = LvenXunJianApplication.getDBHelper();
+    public PictureDao(Context context) {
+        mDBHelper = new DBHelper(context);
     }
 
     /**

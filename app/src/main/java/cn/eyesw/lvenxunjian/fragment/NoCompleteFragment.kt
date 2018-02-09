@@ -31,7 +31,6 @@ import com.baidu.mapapi.navi.BaiduMapNavigation
 import com.baidu.mapapi.navi.NaviParaOption
 import com.baidu.mapapi.model.LatLng
 
-
 /**
  * 未完成
  */
@@ -55,6 +54,7 @@ class NoCompleteFragment : BaseFragment() {
         repairList.enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
                 val json = String(response?.body()?.bytes()!!)
+
                 val jsonObject = JSONObject(json)
                 val code = jsonObject.getInt("code")
                 if (code == 200) {
@@ -67,7 +67,7 @@ class NoCompleteFragment : BaseFragment() {
                         val staffName = data.getString("staff_name")
                         val dnote = data.getString("dnote")
                         val address = data.getString("addr")
-                        var ctime = data.getString("completetime")
+                        var ctime = data.getString("ctime")
                         val status = data.getString("status")
                         val managerName = data.getString("manager_name")
                         val longitude = data.getString("longitude")

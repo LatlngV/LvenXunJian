@@ -301,6 +301,8 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
      */
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            // 巡检轨迹
+            R.id.menu_home_patrol_track -> startActivity(PatrolAreaActivity::class.java)
         // 数据采集
             R.id.menu_home_data_collection -> startActivity(DataCollectionActivity::class.java)
         // 抢维修

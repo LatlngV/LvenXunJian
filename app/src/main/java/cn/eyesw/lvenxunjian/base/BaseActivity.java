@@ -15,8 +15,6 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import cn.eyesw.lvenxunjian.R;
-import cn.eyesw.lvenxunjian.constant.Constant;
-import cn.eyesw.lvenxunjian.utils.LogUtil;
 import me.weyye.hipermission.HiPermission;
 import me.weyye.hipermission.PermissionCallback;
 import me.weyye.hipermission.PermissionItem;
@@ -28,7 +26,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     private Unbinder mUnbinder;
     public Context mContext;
-    public LogUtil mLogUtil;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,12 +34,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         mUnbinder = ButterKnife.bind(this);
         mContext = this.getApplicationContext();
-
-        // 初始化 log
-        mLogUtil = new LogUtil.Builder()
-                .setLogSwitch(true)
-                .setLogTag(Constant.TAG)
-                .build();
 
         // 初始化 Toolbar
         initToolbar();

@@ -6,13 +6,13 @@ package cn.eyesw.lvenxunjian.constant;
 public class NetworkApi {
 
     // 中世 base_url
-    public static final String BASE_URI = "http://121.42.136.94/gh_admin/api";
-    public static final String BASE_URI_ZS = "http://121.42.136.94/gh_admin/api/";
+    public static final String BASE_URI = "http://121.42.136.94/admin/api";
+    public static final String BASE_URI_ZS = "http://121.42.136.94/admin/api/";
     // 登陆
     public static final String LOGIN = BASE_URI + "/login";
 
-    // 员工详情
     public static final String STAFF_DETAIL = BASE_URI + "/staff_detail";
+    // 员工详情
     // 上传头像
     public static final String STAFF_PORTRAIT = BASE_URI + "/staff_portrait";
     // 隐患级别
@@ -72,5 +72,7 @@ public class NetworkApi {
 
     // 巡检任务
     public static final String TASK = BASE_URI + "/tasks";
+    // 轨迹
+    public static final String ROUTE_MAP = BASE_URI + "/route_map";
 
 }

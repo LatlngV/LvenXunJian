@@ -18,6 +18,9 @@ import cn.eyesw.lvenxunjian.constant.Constant
 import cn.eyesw.lvenxunjian.utils.BitmapUtil
 import cn.eyesw.lvenxunjian.utils.NetWorkUtil
 import cn.eyesw.lvenxunjian.utils.ToolbarUtil
+import com.baidu.location.BDLocationListener
+import com.baidu.location.LocationClient
+import com.baidu.location.LocationClientOption
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_staff_data.*
 import me.weyye.hipermission.PermissionItem
@@ -39,6 +42,11 @@ class StaffDataActivity : BaseActivity() {
     private var mOutFile: File? = null
     private var mBitmapList = ArrayList<Bitmap>()
     private var mApiService: ApiService? = null
+    private var mLocationClient: LocationClient? = null
+    private var mLatitude: Double = 0.0
+    private var mLongitude: Double = 0.0
+    private var mAddress: String? = null
+    private var isFirst = true
 
     override fun getContentLayoutRes(): Int = R.layout.activity_staff_data
 
@@ -53,6 +61,8 @@ class StaffDataActivity : BaseActivity() {
         val staffName = intent.getStringExtra("staff_name")
         val dnote = intent.getStringExtra("dnote")
         val address = intent.getStringExtra("addr")
+
+        initPosition()
 
         staff_data_tv_danger_address.text = "隐患位置：$address"
         staff_data_tv_danger_des.text = "隐患描述：$dnote"
@@ -73,6 +83,35 @@ class StaffDataActivity : BaseActivity() {
         staff_data_iv_third.setOnClickListener(mOnClick)
         staff_data_iv_forth.setOnClickListener(mOnClick)
         staff_data_btn_upload.setOnClickListener(mOnClick)
+    }
+
+    override fun onDestroy() {
+        if (mLocationClient != null) {
+            mLocationClient?.stop()
+            mLocationClient?.unRegisterLocationListener(mBDLocationListener)
+        }
+        super.onDestroy()
+    }
+
+    private fun initPosition() {
+        mLocationClient = LocationClient(mContext)
+        // 授权
+        val permissions = java.util.ArrayList<PermissionItem>()
+        permissions.add(PermissionItem(Manifest.permission.ACCESS_FINE_LOCATION, "精确位置", R.drawable.permission_ic_location))
+        permission(permissions) {
+            mLocationClient?.registerLocationListener(mBDLocationListener)
+            val option = LocationClientOption()
+            // 当前位置
+            option.setIsNeedAddress(true)
+            // 打开 gps
+            option.isOpenGps = true
+            // 设置坐标类型
+            option.setCoorType("bd09ll")
+            // 定位的频率
+            option.setScanSpan(1000 * 20)
+            mLocationClient!!.locOption = option
+            mLocationClient!!.start()
+        }
     }
 
     private val mOnClick = View.OnClickListener { view ->
@@ -126,13 +165,15 @@ class StaffDataActivity : BaseActivity() {
 
     private fun uploadData() {
         val note = urgent_tv_des.text.toString()
-        val saveRepairCheck = mApiService?.saveRepairCheck(mDid.toString(), note)
+        mAddress = urgent_tv_address.text.toString()
+        val saveRepairCheck = mApiService?.saveRepairCheck(mDid.toString(), note, mLatitude.toString(), mLongitude.toString(), mAddress)
         saveRepairCheck?.enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
                 val json = String(response?.body()?.bytes()!!)
                 val obj = JSONObject(json)
                 val code = obj.getInt("code")
                 if (code == 200) {
+
                     // 上传图片
                     uploadBitmap()
                 }
@@ -325,6 +366,18 @@ class StaffDataActivity : BaseActivity() {
                 showToast(getString(R.string.network_error))
             }
         })
+    }
+
+    private val mBDLocationListener = BDLocationListener { location ->
+        // 获取纬度信息
+        mLatitude = location?.latitude!!
+        // 获取经度信息
+        mLongitude = location.longitude
+        mAddress = location.addrStr
+        if (isFirst) {
+            isFirst = false
+            urgent_tv_address.setText(mAddress)
+        }
     }
 
 }

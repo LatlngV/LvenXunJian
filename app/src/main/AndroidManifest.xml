@@ -8,23 +8,12 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <!-- 相机权限 -->
     <uses-permission android:name="android.permission.CAMERA"/>
-    <!-- 网络状态 -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <!-- 获取设备网络状态，禁用后无法获取网络状态 -->
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- 网络权限，当禁用后，无法进行检索等相关业务 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <!-- 读取设备硬件信息，统计数据 -->
     <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS"/>
-    <!-- 读取系统信息，包含系统版本等信息，用作统计 -->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <!-- 获取设备的网络状态，鉴权所需网络代理 -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <!-- 允许sd卡写权限，需写入地图数据，禁用后无法显示地图 -->
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
-    <!-- 获取统计数据 -->
     <uses-permission android:name="android.permission.GET_TASKS"/>
-    <!-- 这个权限用于进行网络定位 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <!-- 这个权限用于访问GPS定位 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -116,9 +105,6 @@
         <activity
             android:name=".ui.MyMessageActivity"
             android:screenOrientation="portrait"/>
-        <activity
-            android:name=".ui.WaterMarkerCameraActivity"
-            android:screenOrientation="portrait"/>
 
         <!-- 管理员界面 -->
         <activity
@@ -151,6 +137,15 @@
         <activity
             android:name=".ui.StaffDataActivity"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.PatrolAreaActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.StaffActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.HistoryTrackActivity"
+            android:screenOrientation="portrait"/>
 
         <!--
         <receiver android:name=".receiver.NetWorkReceiver">
@@ -163,25 +158,25 @@
         <service
             android:name=".service.UploadPictureService"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="false"/>
         <service
             android:name=".service.UpdateClockService"
             android:enabled="true"
-            android:exported="true"/>
-
-        <!-- Android 7.0 问题 -->
-        <!--<provider-->
-            <!--android:name="android.support.v4.content.FileProvider"-->
-            <!--android:authorities="cn.eyesw.lvenxunjian.fileprovider"-->
-            <!--android:exported="false"-->
-            <!--android:grantUriPermissions="true">-->
-
-            <!--&lt;!&ndash; 元数据 &ndash;&gt;-->
-            <!--<meta-data-->
-                <!--android:name="android.support.FILE_PROVIDER_PATHS"-->
-                <!--android:resource="@xml/file_path"/>-->
-        <!--</provider>-->
-
+            android:exported="false"/>
+        <service
+            android:name=".service.UploadLatlngService"
+            android:enabled="true"
+            android:exported="false"/>
+        <service
+            android:name=".service.FirstService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
+        <service
+            android:name=".service.SecondService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>

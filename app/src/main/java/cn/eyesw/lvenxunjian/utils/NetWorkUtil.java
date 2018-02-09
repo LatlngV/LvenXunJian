@@ -14,7 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class NetWorkUtil {
 
-    private static NetWorkUtil sNetWorkUtil;
+    private static volatile NetWorkUtil sNetWorkUtil;
     private Retrofit mRetrofit;
     private ApiService mApiService;
 

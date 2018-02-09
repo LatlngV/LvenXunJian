@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.StrictMode;
 
 import com.baidu.mapapi.SDKInitializer;
+import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.Logger;
 
 import cn.eyesw.greendao.DaoMaster;
 import cn.eyesw.greendao.DaoSession;
@@ -17,7 +19,6 @@ import cn.eyesw.lvenxunjian.database.DBHelper;
 public class LvenXunJianApplication extends Application {
 
     private static DaoSession sDaoSession;
-    private static DBHelper sDBHelper;
 
     @Override
     public void onCreate() {
@@ -35,16 +36,11 @@ public class LvenXunJianApplication extends Application {
         DaoMaster daoMaster = new DaoMaster(sqLiteDatabase);
         sDaoSession = daoMaster.newSession();
 
-        // 初始化 DBHelper
-        sDBHelper = new DBHelper(this);
+        Logger.addLogAdapter(new AndroidLogAdapter());
     }
 
     public static DaoSession getDaoSession() {
         return sDaoSession;
-    }
-
-    public static DBHelper getDBHelper() {
-        return sDBHelper;
     }
 
 }

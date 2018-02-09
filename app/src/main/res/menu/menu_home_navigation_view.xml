@@ -4,6 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menu_home_patrol_track"
+        android:icon="@drawable/data_collection4"
+        android:title="巡检轨迹"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/menu_home_data_collection"
         android:icon="@drawable/data_collection1"
         android:title="巡检上报"

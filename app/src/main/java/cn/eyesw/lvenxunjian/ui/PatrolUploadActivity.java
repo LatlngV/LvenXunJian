@@ -2,16 +2,20 @@ package cn.eyesw.lvenxunjian.ui;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -32,13 +36,15 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import cn.eyesw.greendao.PhotoBeanDao;
+import cn.eyesw.lvenxunjian.LvenXunJianApplication;
 import cn.eyesw.lvenxunjian.R;
 import cn.eyesw.lvenxunjian.base.BaseActivity;
-import cn.eyesw.lvenxunjian.bean.PictureBean;
+import cn.eyesw.lvenxunjian.bean.PhotoBean;
 import cn.eyesw.lvenxunjian.constant.NetworkApi;
+import cn.eyesw.lvenxunjian.service.UploadPictureService;
 import cn.eyesw.lvenxunjian.utils.BitmapUtil;
 import cn.eyesw.lvenxunjian.utils.OkHttpManager;
-import cn.eyesw.lvenxunjian.utils.PictureDao;
 import cn.eyesw.lvenxunjian.utils.SpUtil;
 import cn.eyesw.lvenxunjian.utils.ToolbarUtil;
 import me.weyye.hipermission.HiPermission;
@@ -51,15 +57,14 @@ import okhttp3.Call;
  */
 public class PatrolUploadActivity extends BaseActivity {
 
-    public final static String SAVED_IMAGE_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath();
-    String photoPath;
+    private String photoPath;
     private Bitmap mBitmap;
     private OkHttpManager mOkHttpManager;
     private SpUtil mSpUtil;
     private String mTime;
     /* 经纬度坐标 */
-    private String mLongitude;
-    private String mLatitude;
+    private String mLongitude = "0";
+    private String mLatitude = "0";
     private String mAddress;
     // 点击 ImageView 的标志位
     private int mIndex = 0;
@@ -81,6 +86,7 @@ public class PatrolUploadActivity extends BaseActivity {
     protected ImageView mImageViewRight;
     @BindView(R.id.upload_btn_commit)
     protected Button mBtnCommit;
+    private PhotoBeanDao mPhotoBeanDao;
 
     @Override
     protected int getContentLayoutRes() {
@@ -98,6 +104,15 @@ public class PatrolUploadActivity extends BaseActivity {
         mBitmapList = new ArrayList<>();
         mOkHttpManager = OkHttpManager.getInstance();
         mSpUtil = SpUtil.getInstance(mContext);
+        mPhotoBeanDao = LvenXunJianApplication.getDaoSession().getPhotoBeanDao();
+
+        /*
+        List<PhotoBean> list = mPhotoBeanDao.queryBuilder().list();
+        if (getNetWork() && list.size() > 0) {
+            Intent intent = new Intent(this, UploadPictureService.class);
+            startService(intent);
+        }
+        */
     }
 
     @Override
@@ -105,6 +120,21 @@ public class PatrolUploadActivity extends BaseActivity {
         super.onStart();
         // 获取经纬度坐标
         getLatlng();
+    }
+
+    @Override
+    protected void onDestroy() {
+        int size = mBitmapList.size();
+        if (size > 0) {
+            for (int i = 0; i < size; i++) {
+                Bitmap bitmap = mBitmapList.get(i);
+                bitmap.recycle();
+            }
+            if (mBitmap != null && !mBitmap.isRecycled()) {
+                mBitmap.recycle();
+            }
+        }
+        super.onDestroy();
     }
 
     @OnClick({R.id.upload_tv_refresh, R.id.upload_image_view_left, R.id.upload_image_view_right, R.id.upload_btn_commit})
@@ -183,22 +213,31 @@ public class PatrolUploadActivity extends BaseActivity {
      * 打开相机拍照
      */
     private void openCamera() {
-        photoPath = SAVED_IMAGE_PATH + "/" + System.currentTimeMillis() + ".png";
-
-        File imageDir = new File(photoPath);
-        if (!imageDir.exists()) {
-            try {
-                // 根据一个 文件地址生成一个新的文件用来存照片
-                imageDir.createNewFile();
-
-            } catch (IOException e) {
-                e.printStackTrace();
+        String state = Environment.getExternalStorageState();
+        if (state.equals(Environment.MEDIA_MOUNTED)) {
+            File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            photoPath = file.getAbsolutePath() + File.separator + System.currentTimeMillis() + ".jpg";
+            if (!file.exists()) {
+                file.mkdirs();
             }
+
+            File imageDir = new File(photoPath);
+            if (!imageDir.exists()) {
+                try {
+                    // 根据一个 文件地址生成一个新的文件用来存照片
+                    imageDir.createNewFile();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            File photoFile = new File(photoPath);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+            startActivityForResult(intent, 1);
+        } else {
+            showToast("存储空间不足");
         }
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File photoFile = new File(photoPath);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-        startActivityForResult(intent, 1);
     }
 
     /**
@@ -216,48 +255,61 @@ public class PatrolUploadActivity extends BaseActivity {
      * 上传照片
      */
     private void sendPortrait() {
-        Map<String, String> map;
-        for (int i = 0; i < mBitmapList.size(); i++) {
-            map = new HashMap<>();
-            Bitmap bitmap = mBitmapList.get(i);
-            String picture = BitmapUtil.convertBitmapToString(bitmap);
-            map.put("file", picture);
-            map.put("task_id", "1");
-            map.put("staff_id", mSpUtil.getString("id"));
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            mTime = format.format(new Date());
-            map.put("photo_time", mTime);
-            map.put("longitude", mLongitude);
-            map.put("latitude", mLatitude);
-            map.put("file_name", "1");
-            mOkHttpManager.postAsyncForm(NetworkApi.UPLOAD_TASK_IMG, map, new OkHttpManager.DataCallback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    PictureDao pictureDao = new PictureDao();
-                    PictureBean pictureBean = new PictureBean(picture, 0 + "", 0 + "", mTime, "");
-                    pictureDao.add(pictureBean);
-                    // 上传失败隐藏 ProgressDialog
-                    mProgressDialog.dismiss();
-                }
-
-                @Override
-                public void onResponse(String json) {
-                    // 释放内存
-                    bitmap.recycle();
-                    mBitmapIndex += 1;
-
-                    if (mBitmapIndex == mBitmapList.size()) {
-                        mProgressDialog.dismiss();
-                        Toast.makeText(mContext, "上传成功", Toast.LENGTH_SHORT).show();
-                        mImageViewLeft.setImageResource(R.drawable.timg);
-                        mImageViewRight.setImageResource(R.drawable.timg);
-                        mBitmap.recycle();
-                        mBitmap = null;
-                        // 清空集合
-                        mBitmapList.clear();
+        boolean netWork = getNetWork();
+        if (netWork) {
+            Map<String, String> map;
+            for (int i = 0; i < mBitmapList.size(); i++) {
+                map = new HashMap<>();
+                Bitmap bitmap = mBitmapList.get(i);
+                String picture = BitmapUtil.convertBitmapToString(bitmap);
+                map.put("file", picture);
+                map.put("task_id", "1");
+                map.put("staff_id", mSpUtil.getString("id"));
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                mTime = format.format(new Date());
+                map.put("photo_time", mTime);
+                map.put("longitude", mLongitude);
+                map.put("latitude", mLatitude);
+                map.put("file_name", "1");
+                mOkHttpManager.postAsyncForm(NetworkApi.UPLOAD_TASK_IMG, map, new OkHttpManager.DataCallback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        showToast(getString(R.string.network_error));
                     }
-                }
-            });
+
+                    @Override
+                    public void onResponse(String json) {
+                        // 释放内存
+                        bitmap.recycle();
+                        mBitmapIndex += 1;
+
+                        if (mBitmapIndex == mBitmapList.size()) {
+                            mProgressDialog.dismiss();
+                            Toast.makeText(mContext, "上传成功", Toast.LENGTH_SHORT).show();
+                            mImageViewLeft.setImageResource(R.drawable.timg);
+                            mImageViewRight.setImageResource(R.drawable.timg);
+                            mBitmap.recycle();
+                            mBitmap = null;
+                            // 清空集合
+                            mBitmapList.clear();
+                            finish();
+                        }
+                    }
+                });
+            }
+        } else {
+            PhotoBean photoBean;
+            for (int i = 0; i < mBitmapList.size(); i++) {
+                Bitmap bitmap = mBitmapList.get(i);
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                mTime = format.format(new Date());
+                photoBean = new PhotoBean(BitmapUtil.convertBitmapToString(bitmap), mLatitude, mLongitude, mTime, "1");
+                mPhotoBeanDao.insert(photoBean);
+                // 添加到数据库
+                bitmap.recycle();
+            }
+            mProgressDialog.dismiss();
+            finish();
         }
     }
 
@@ -301,21 +353,40 @@ public class PatrolUploadActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
             File photoFile = new File(photoPath);
-            if (photoFile.exists()) {
-                //通过图片地址将图片加载到bitmap里面
-                mBitmap = compressBitmap(photoFile.getAbsolutePath(), 720, 960);
+            String path = photoFile.getAbsolutePath();
+            if (!TextUtils.isEmpty(path)) {
+                if (photoFile.exists()) {
+                    mBitmap = compressBitmap(path);
+                    switch (mIndex) {
+                        case 0:
+                            if (mBitmap == null) {
+                                mImageViewLeft.setImageResource(R.drawable.timg);
+                            } else {
+                                mImageViewLeft.setImageBitmap(mBitmap);
+                                mBitmapList.add(mBitmap);
+                            }
+                            break;
+                        case 1:
+                            if (mBitmap == null) {
+                                mImageViewRight.setImageResource(R.drawable.timg);
+                            } else {
+                                mImageViewRight.setImageBitmap(mBitmap);
+                                mBitmapList.add(mBitmap);
+                            }
+                            break;
+                    }
+                    if (mBitmapList.size() == 2) {
+                        mBtnCommit.setEnabled(true);
+                    }
+                }
+            } else {
                 switch (mIndex) {
                     case 0:
-                        mImageViewLeft.setImageBitmap(mBitmap);
-                        mBitmapList.add(mBitmap);
+                        mImageViewLeft.setImageResource(R.drawable.timg);
                         break;
                     case 1:
-                        mImageViewRight.setImageBitmap(mBitmap);
-                        mBitmapList.add(mBitmap);
+                        mImageViewRight.setImageResource(R.drawable.timg);
                         break;
-                }
-                if (mBitmapList.size() == 2) {
-                    mBtnCommit.setEnabled(true);
                 }
             }
         }
@@ -324,47 +395,44 @@ public class PatrolUploadActivity extends BaseActivity {
     /**
      * 压缩图片
      */
-    private Bitmap compressBitmap(String path, double width, double height) {
+    private Bitmap compressBitmap(String path) {
         BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = false; // 设置了此属性一定要记得将值设置为 false
-        Bitmap bitmap = BitmapFactory.decodeFile(path);
-        // 防止 OOM 发生
-        int bitmapWidth = bitmap.getWidth();
-        int bitmapHeight = bitmap.getHeight();
-        Matrix matrix = new Matrix();
-        float scaleWidth;
-        float scaleHeight;
-        if (bitmapWidth <= bitmapHeight) {
-            scaleWidth = (float) (width / bitmapWidth);
-            scaleHeight = (float) (height / bitmapHeight);
-        } else {
-            scaleWidth = (float) (height / bitmapWidth);
-            scaleHeight = (float) (width / bitmapHeight);
-        }
-        // 按照固定大小对图片进行缩放
-        matrix.postScale(scaleWidth, scaleHeight);
-        Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, true);
-        // 用完了记得回收
-        bitmap.recycle();
-        return newBitmap;
+        options.inJustDecodeBounds = false;
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        options.inSampleSize = 8;
+        options.inPurgeable = true;
+        options.inInputShareable = true;
+        return BitmapFactory.decodeFile(path, options);
     }
 
     /**
-     * 设置 Bitmap 加载方式
+     * 获取网络连接类型，如果是 4G 和 WiFi 就返回 true
      */
-    private BitmapFactory.Options bitmapOptions() {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        // 为位图设置缓存
-        options.inTempStorage = new byte[1024 * 1024];
-        // 设置位图颜色显示优化方式
-        options.inPreferredConfig = Bitmap.Config.RGB_565;
-        // 设置图片可以回收
-        options.inPurgeable = true;
-        // 设置图片缩放比例
-        options.inSampleSize = 4;
-        // 设置解码位图的尺寸信息
-        options.inInputShareable = true;
-        return options;
+    private boolean getNetWork() {
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        // 判断是不是连接的是不是 wifi
+        NetworkInfo wifiInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (null != wifiInfo) {
+            NetworkInfo.State state = wifiInfo.getState();
+            if (null != state)
+                if (state == NetworkInfo.State.CONNECTED || state == NetworkInfo.State.CONNECTING) {
+                    return true;
+                }
+        }
+        // 如果不是 wifi，则判断当前连接的是运营商的哪种网络 2g、3g、4g 等
+        NetworkInfo networkInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo activeNetInfo = connManager.getActiveNetworkInfo();
+        if (null != networkInfo) {
+            NetworkInfo.State state = networkInfo.getState();
+            if (null != state)
+                if (state == NetworkInfo.State.CONNECTED || state == NetworkInfo.State.CONNECTING) {
+                    if (activeNetInfo.getSubtype() == TelephonyManager.NETWORK_TYPE_LTE) {
+                        return true;
+                    }
+                }
+        }
+        return false;
     }
 
 }

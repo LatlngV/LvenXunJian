@@ -375,7 +375,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     startTime = System.currentTimeMillis();
                     return true;
                 } else {
-                    System.exit(0);
+                    finish();
                 }
             }
         }

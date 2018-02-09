@@ -10,6 +10,7 @@
         android:id="@+id/law_item_tv_title"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:background="#33000000"
         android:gravity="center_vertical"
         android:paddingLeft="10dp"
         android:textColor="@color/black"

@@ -89,7 +89,8 @@ public interface ApiService {
      */
     @FormUrlEncoded
     @POST("save_weixiu_check")
-    Call<ResponseBody> saveRepairCheck(@Field("id") String dataId, @Field("note") String note);
+    Call<ResponseBody> saveRepairCheck(@Field("id") String dataId, @Field("note") String note, @Field("latitude") String latitude,
+                                       @Field("longitude") String longitude, @Field("address") String address);
 
     @FormUrlEncoded
     @POST("upload_weixiu_check_img")
@@ -100,5 +101,19 @@ public interface ApiService {
      */
     @GET("line_position")
     Call<ResponseBody> allPipeline();
+
+    /**
+     * 巡线区
+     */
+    @FormUrlEncoded
+    @POST("staff_team")
+    Call<ResponseBody> patrolArea(@Field("staff_id") String staffId);
+
+    /**
+     * 上传当前位置
+     */
+    @FormUrlEncoded
+    @POST("test_aaa")
+    Call<ResponseBody> currentPosition(@Field("latitude") String latitude, @Field("longitude") String longitude, @Field("address") String address);
 
 }

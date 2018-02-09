@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.eyesw.greendao.PhotoBeanDao;
+import cn.eyesw.lvenxunjian.LvenXunJianApplication;
+import cn.eyesw.lvenxunjian.bean.PhotoBean;
 import cn.eyesw.lvenxunjian.bean.PictureBean;
 import cn.eyesw.lvenxunjian.constant.NetworkApi;
 import cn.eyesw.lvenxunjian.utils.OkHttpManager;
@@ -38,12 +41,12 @@ public class UploadPictureService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        PictureDao pictureDao = new PictureDao();
-        List<PictureBean> list = pictureDao.query();
+        PhotoBeanDao photoBeanDao = LvenXunJianApplication.getDaoSession().getPhotoBeanDao();
+        List<PhotoBean> list = photoBeanDao.queryBuilder().list();
         if (list != null && list.size() > 0) {
             for (int i = 0; i < list.size(); i++) {
-                PictureBean pictureBean = list.get(i);
-                String picture = pictureBean.getPicture();
+                PhotoBean pictureBean = list.get(i);
+                String picture = pictureBean.getBitmap();
                 String longitude = pictureBean.getLongitude();
                 String latitude = pictureBean.getLatitude();
                 String date = pictureBean.getDate();
@@ -70,7 +73,8 @@ public class UploadPictureService extends Service {
                 });
             }
             // 清空数据库
-            pictureDao.delete();
+            photoBeanDao.deleteAll();
+            stopSelf();
         }
     }
 

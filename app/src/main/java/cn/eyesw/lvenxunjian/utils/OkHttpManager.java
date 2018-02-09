@@ -6,6 +6,7 @@ import android.os.Looper;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -19,21 +20,28 @@ import okhttp3.Response;
  */
 public class OkHttpManager {
 
-    private static OkHttpManager sOkHttpManager;
+    private static volatile OkHttpManager sOkHttpManager;
     private OkHttpClient mOkHttpClient;
     private static Handler mHandler;
 
     public static OkHttpManager getInstance() {
         if (sOkHttpManager == null) {
             synchronized (OkHttpManager.class) {
-                sOkHttpManager = new OkHttpManager();
+                if (sOkHttpManager == null) {
+                    sOkHttpManager = new OkHttpManager();
+                }
             }
         }
         return sOkHttpManager;
     }
 
     private OkHttpManager() {
-        mOkHttpClient = new OkHttpClient();
+        mOkHttpClient = new OkHttpClient.Builder()
+                .readTimeout(1, TimeUnit.SECONDS)
+                .writeTimeout(1, TimeUnit.SECONDS)
+                .connectTimeout(1, TimeUnit.SECONDS)
+                .retryOnConnectionFailure(false)
+                .build();
         mHandler = new Handler(Looper.getMainLooper());
     }
 

@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
  */
 public class SpUtil {
 
-    private static SpUtil sSpUtil;
+    private static volatile SpUtil sSpUtil;
     private final SharedPreferences mPreferences;
     private static final String LVEN_XUN_JIAN = "LvenXunJian";
 
@@ -18,7 +18,9 @@ public class SpUtil {
     public static SpUtil getInstance(Context context) {
         if (sSpUtil == null) {
             synchronized (SpUtil.class) {
-                sSpUtil = new SpUtil(context);
+                if (sSpUtil == null) {
+                    sSpUtil = new SpUtil(context);
+                }
             }
         }
         return sSpUtil;

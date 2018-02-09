@@ -22,6 +22,7 @@ public class DaoMaster extends AbstractDaoMaster {
     /** Creates underlying database table using DAOs. */
     public static void createAllTables(Database db, boolean ifNotExists) {
         LatlngEntityDao.createTable(db, ifNotExists);
+        PhotoBeanDao.createTable(db, ifNotExists);
         PipelineBeanDao.createTable(db, ifNotExists);
         PipelinePointBeanDao.createTable(db, ifNotExists);
     }
@@ -29,6 +30,7 @@ public class DaoMaster extends AbstractDaoMaster {
     /** Drops underlying database table using DAOs. */
     public static void dropAllTables(Database db, boolean ifExists) {
         LatlngEntityDao.dropTable(db, ifExists);
+        PhotoBeanDao.dropTable(db, ifExists);
         PipelineBeanDao.dropTable(db, ifExists);
         PipelinePointBeanDao.dropTable(db, ifExists);
     }
@@ -50,6 +52,7 @@ public class DaoMaster extends AbstractDaoMaster {
     public DaoMaster(Database db) {
         super(db, SCHEMA_VERSION);
         registerDaoClass(LatlngEntityDao.class);
+        registerDaoClass(PhotoBeanDao.class);
         registerDaoClass(PipelineBeanDao.class);
         registerDaoClass(PipelinePointBeanDao.class);
     }

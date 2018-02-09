@@ -1,7 +1,6 @@
 package cn.eyesw.lvenxunjian.ui;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,10 +10,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
-import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -60,6 +58,7 @@ import cn.eyesw.lvenxunjian.bean.LatlngEntity;
 import cn.eyesw.lvenxunjian.constant.Constant;
 import cn.eyesw.lvenxunjian.constant.NetworkApi;
 import cn.eyesw.lvenxunjian.service.UpdateClockService;
+import cn.eyesw.lvenxunjian.service.UploadLatlngService;
 import cn.eyesw.lvenxunjian.utils.DensityUtil;
 import cn.eyesw.lvenxunjian.utils.OkHttpManager;
 import cn.eyesw.lvenxunjian.utils.SpUtil;
@@ -97,6 +96,7 @@ public class PatrolTaskActivity extends BaseActivity {
     private LatlngEntityDao mLatlngEntityDao;
     private LatlngEntity mLatlngEntity;
     private boolean mIsFirst = true;
+    private Intent mLatLngService;
 
     @BindView(R.id.patrol_task_toolbar)
     protected Toolbar mToolbar;
@@ -201,6 +201,7 @@ public class PatrolTaskActivity extends BaseActivity {
         option.setScanSpan(1000 * 20);
         mLocationClient.setLocOption(option);
         mLocationClient.start();
+        mLocationClient.restart();
         // 开启定位图层
         mBaiduMap.setMyLocationEnabled(true);
     }
@@ -268,6 +269,10 @@ public class PatrolTaskActivity extends BaseActivity {
                         String status = data.getString("status");
                         if (status.equals("0")) {
                             mBtnStart.setText("开始巡检");
+                            mFlag = true;
+                            if (mLatLngService != null) {
+                                stopService(mLatLngService);
+                            }
                         } else if (status.equals("1")) {
                             mBtnStart.setText("结束巡检");
                             mFlag = false;
@@ -278,11 +283,14 @@ public class PatrolTaskActivity extends BaseActivity {
                             startService(mService);
                             // 注册广播
                             registerBroadcastReceiver();
+                            // 开启定位服务
+                            if (mLatLngService == null) {
+                                mLatLngService = new Intent(getApplicationContext(), UploadLatlngService.class);
+                                startService(mLatLngService);
+                            }
                             // 获取必经点的集合
                             getStaffPointState();
                         }
-                        // 获取必经点的集合
-                        getStaffPointState();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -594,9 +602,9 @@ public class PatrolTaskActivity extends BaseActivity {
                         mLongitude = data.getString("longitude");
                         mLatitude = data.getString("latitude");
                         mAddress = data.getString("address");
+                        // 获取打卡状态
+                        getClockStatus();
                     }
-                    // 获取打卡状态
-                    getClockStatus();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -611,16 +619,7 @@ public class PatrolTaskActivity extends BaseActivity {
      */
     @OnClick(R.id.patrol_task_btn_start)
     public void onClick() {
-
         if (mFlag) {
-            if (mPositions == null) {
-                Dialog dialog = new Dialog(this);
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                View view = View.inflate(mContext, R.layout.dialog_patrol_task, null);
-                dialog.setContentView(view);
-                dialog.show();
-                return;
-            }
             mBtnStart.setText("结束巡检");
 
             mFlag = false;
@@ -630,23 +629,37 @@ public class PatrolTaskActivity extends BaseActivity {
             startService(mService);
             // 注册广播
             registerBroadcastReceiver();
+
+            // 开启定位服务
+            mLatLngService = new Intent(getApplicationContext(), UploadLatlngService.class);
+            startService(mLatLngService);
+
             mHandler.removeCallbacksAndMessages(null);
             // 获取必经点状态
             getStaffPointState();
+            isSign();
         } else {
-            mBtnStart.setText("开始巡检");
-            mFlag = true;
-            mHandler.removeCallbacksAndMessages(null);
-            // 关闭服务
-            stopService(mService);
-            // 广播解注册
-            if (mTimeReceiver != null) {
-                unregisterReceiver(mTimeReceiver);
-                mTimeReceiver = null;
-            }
-            mTvTimer.setText("00:00:00");
+            new AlertDialog.Builder(this)
+                    .setMessage("确定要结束巡检吗？")
+                    .setPositiveButton("确定", (dialog, which) -> {
+                        mBtnStart.setText("开始巡检");
+                        mFlag = true;
+                        mHandler.removeCallbacksAndMessages(null);
+                        // 关闭服务
+                        stopService(mService);
+                        // 广播解注册
+                        if (mTimeReceiver != null) {
+                            unregisterReceiver(mTimeReceiver);
+                            mTimeReceiver = null;
+                        }
+                        mTvTimer.setText("00:00:00");
+                        // 关闭定位服务
+                        stopService(mLatLngService);
+                        isSign();
+                    })
+                    .setNegativeButton("取消", null)
+                    .show();
         }
-        isSign();
     }
 
     @OnClick(R.id.patrol_task_patrol_upload)
@@ -732,7 +745,7 @@ public class PatrolTaskActivity extends BaseActivity {
             // 设置定位数据
             mBaiduMap.setMyLocationData(myLocationData);
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.marker);
-            MyLocationConfiguration myLocationConfiguration = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, bitmapDescriptor);
+            MyLocationConfiguration myLocationConfiguration = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.FOLLOWING, true, bitmapDescriptor);
             mBaiduMap.setMyLocationConfiguration(myLocationConfiguration);
             LatLng ll = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
             MapStatus.Builder builder = new MapStatus.Builder();
