@@ -112,6 +112,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // 初始化 DrawerLayout
         initDrawerLayout();
 
+        // 初始化 NavigationView
+        initNavigationView();
+
         // 获取底部通知栏消息
         getBottomMessage();
     }
@@ -125,6 +128,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mOkHttpManager.postAsyncForm(NetworkApi.MY_MESSAGE, map, new OkHttpManager.DataCallback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                call.cancel();
             }
 
             @Override
@@ -206,6 +210,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             String apkUrl = mSpUtil.getString(Constant.APK_URL);
             UpdateManager updateManager = new UpdateManager(this, apkUrl);
             updateManager.checkUpdateInfo();
+//            Intent intent = new Intent(this, DownloadService.class);
+//            intent.putExtra("url", apkUrl);
+//            startService(intent);
         }
     };
 
@@ -216,13 +223,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // 初始化 NavigationView
-        initNavigationView();
     }
 
     /**

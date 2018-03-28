@@ -4,14 +4,12 @@ import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.StrictMode;
 
+import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
-import com.orhanobut.logger.AndroidLogAdapter;
-import com.orhanobut.logger.Logger;
 
 import cn.eyesw.greendao.DaoMaster;
 import cn.eyesw.greendao.DaoSession;
 import cn.eyesw.lvenxunjian.constant.Constant;
-import cn.eyesw.lvenxunjian.database.DBHelper;
 
 /**
  * 巡检 APP
@@ -25,6 +23,7 @@ public class LvenXunJianApplication extends Application {
         super.onCreate();
         // 初始化百度地图
         SDKInitializer.initialize(getApplicationContext());
+        SDKInitializer.setCoordType(CoordType.BD09LL);
 
         // 适配 Android 7.0 FileProvider 问题
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
@@ -35,8 +34,6 @@ public class LvenXunJianApplication extends Application {
         SQLiteDatabase sqLiteDatabase = devOpenHelper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(sqLiteDatabase);
         sDaoSession = daoMaster.newSession();
-
-        Logger.addLogAdapter(new AndroidLogAdapter());
     }
 
     public static DaoSession getDaoSession() {

@@ -79,7 +79,7 @@ public class LawRegulationActivity extends BaseActivity {
             if (view == null) {
                 view = View.inflate(mContext, R.layout.law_list_view, null);
             }
-            TextView tvTitle = (TextView) view.findViewById(R.id.law_item_tv_title);
+            TextView tvTitle = view.findViewById(R.id.law_item_tv_title);
             tvTitle.setText(mDatas.get(i));
             return view;
         }

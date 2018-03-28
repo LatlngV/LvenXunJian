@@ -1,8 +1,11 @@
 package cn.eyesw.lvenxunjian.constant;
 
+import java.util.Map;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
+import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -113,7 +116,14 @@ public interface ApiService {
      * 上传当前位置
      */
     @FormUrlEncoded
-    @POST("test_aaa")
-    Call<ResponseBody> currentPosition(@Field("latitude") String latitude, @Field("longitude") String longitude, @Field("address") String address);
+    @POST("staff_position")
+    Call<ResponseBody> staffPosition(@Field("staff_id") String staffId, @Field("latitude") String latitude, @Field("longitude") String longitude);
+
+    /**
+     * 上传当前位置
+     */
+    @FormUrlEncoded
+    @POST("staff_position")
+    Call<ResponseBody> sendPosition(@FieldMap Map<String, String> map);
 
 }

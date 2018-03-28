@@ -6,8 +6,6 @@ import cn.eyesw.lvenxunjian.constant.ApiService;
 import cn.eyesw.lvenxunjian.constant.NetworkApi;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Retrofit 网络请求工具类
@@ -45,8 +43,6 @@ public class NetWorkUtil {
         mRetrofit = new Retrofit.Builder()
                 .baseUrl(NetworkApi.BASE_URI_ZS)
                 .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
     }
 

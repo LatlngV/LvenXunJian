@@ -13,10 +13,8 @@ import java.util.Map;
 import cn.eyesw.greendao.PhotoBeanDao;
 import cn.eyesw.lvenxunjian.LvenXunJianApplication;
 import cn.eyesw.lvenxunjian.bean.PhotoBean;
-import cn.eyesw.lvenxunjian.bean.PictureBean;
 import cn.eyesw.lvenxunjian.constant.NetworkApi;
 import cn.eyesw.lvenxunjian.utils.OkHttpManager;
-import cn.eyesw.lvenxunjian.utils.PictureDao;
 import cn.eyesw.lvenxunjian.utils.SpUtil;
 import okhttp3.Call;
 

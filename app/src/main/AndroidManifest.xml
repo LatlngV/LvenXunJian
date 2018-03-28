@@ -147,14 +147,6 @@
             android:name=".ui.HistoryTrackActivity"
             android:screenOrientation="portrait"/>
 
-        <!--
-        <receiver android:name=".receiver.NetWorkReceiver">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-            </intent-filter>
-        </receiver>
-        -->
-
         <service
             android:name=".service.UploadPictureService"
             android:enabled="true"
@@ -164,19 +156,10 @@
             android:enabled="true"
             android:exported="false"/>
         <service
-            android:name=".service.UploadLatlngService"
+            android:name=".service.DownloadService"
             android:enabled="true"
             android:exported="false"/>
-        <service
-            android:name=".service.FirstService"
-            android:enabled="true"
-            android:exported="false">
-        </service>
-        <service
-            android:name=".service.SecondService"
-            android:enabled="true"
-            android:exported="false">
-        </service>
+
     </application>
 
 </manifest>

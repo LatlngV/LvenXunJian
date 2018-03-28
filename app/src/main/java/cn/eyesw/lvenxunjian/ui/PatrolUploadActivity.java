@@ -73,6 +73,7 @@ public class PatrolUploadActivity extends BaseActivity {
     // 上传图片的标志位
     private int mBitmapIndex;
     private ProgressDialog mProgressDialog;
+    private PhotoBeanDao mPhotoBeanDao;
 
     @BindView(R.id.upload_toolbar)
     protected Toolbar mToolbar;
@@ -86,7 +87,6 @@ public class PatrolUploadActivity extends BaseActivity {
     protected ImageView mImageViewRight;
     @BindView(R.id.upload_btn_commit)
     protected Button mBtnCommit;
-    private PhotoBeanDao mPhotoBeanDao;
 
     @Override
     protected int getContentLayoutRes() {
@@ -106,13 +106,11 @@ public class PatrolUploadActivity extends BaseActivity {
         mSpUtil = SpUtil.getInstance(mContext);
         mPhotoBeanDao = LvenXunJianApplication.getDaoSession().getPhotoBeanDao();
 
-        /*
         List<PhotoBean> list = mPhotoBeanDao.queryBuilder().list();
         if (getNetWork() && list.size() > 0) {
             Intent intent = new Intent(this, UploadPictureService.class);
             startService(intent);
         }
-        */
     }
 
     @Override
@@ -124,15 +122,9 @@ public class PatrolUploadActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        int size = mBitmapList.size();
-        if (size > 0) {
-            for (int i = 0; i < size; i++) {
-                Bitmap bitmap = mBitmapList.get(i);
-                bitmap.recycle();
-            }
-            if (mBitmap != null && !mBitmap.isRecycled()) {
-                mBitmap.recycle();
-            }
+        mBitmapList.clear();
+        if (mBitmap != null && !mBitmap.isRecycled()) {
+            mBitmap.recycle();
         }
         super.onDestroy();
     }
@@ -204,7 +196,7 @@ public class PatrolUploadActivity extends BaseActivity {
                     @Override
                     public void onGuarantee(String permission, int position) {
                         // 打开相机拍照
-                        openCamera();
+                        // openCamera();
                     }
                 });
     }
@@ -275,6 +267,10 @@ public class PatrolUploadActivity extends BaseActivity {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         showToast(getString(R.string.network_error));
+                        // 插入到数据库
+                        insert2DB();
+                        mProgressDialog.dismiss();
+                        finish();
                     }
 
                     @Override
@@ -298,18 +294,25 @@ public class PatrolUploadActivity extends BaseActivity {
                 });
             }
         } else {
-            PhotoBean photoBean;
-            for (int i = 0; i < mBitmapList.size(); i++) {
-                Bitmap bitmap = mBitmapList.get(i);
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                mTime = format.format(new Date());
-                photoBean = new PhotoBean(BitmapUtil.convertBitmapToString(bitmap), mLatitude, mLongitude, mTime, "1");
-                mPhotoBeanDao.insert(photoBean);
-                // 添加到数据库
-                bitmap.recycle();
-            }
+            // 插入到数据库中
+            insert2DB();
             mProgressDialog.dismiss();
             finish();
+        }
+    }
+
+    /**
+     * 插入到数据库
+     */
+    private void insert2DB() {
+        for (int i = 0; i < mBitmapList.size(); i++) {
+            Bitmap bitmap = mBitmapList.get(i);
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            mTime = format.format(new Date());
+            PhotoBean photoBean = new PhotoBean(BitmapUtil.convertBitmapToString(bitmap), mLatitude, mLongitude, mTime, "1");
+            mPhotoBeanDao.insert(photoBean);
+            // 添加到数据库
+            bitmap.recycle();
         }
     }
 
@@ -399,7 +402,7 @@ public class PatrolUploadActivity extends BaseActivity {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = false;
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        options.inSampleSize = 8;
+        options.inSampleSize = 4;
         options.inPurgeable = true;
         options.inInputShareable = true;
         return BitmapFactory.decodeFile(path, options);

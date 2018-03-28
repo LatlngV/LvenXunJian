@@ -27,7 +27,8 @@ public class NetworkApi {
     public static final String RULE_DETAIL = BASE_URI + "/rule_detail";
 
     // GPS 定位
-    public static final String GPS = BASE_URI + "/staff_gps";
+    // public static final String GPS = BASE_URI + "/staff_gps";
+    public static final String GPS = BASE_URI + "/staff_gps_new";
     // 地图
     public static final String MAP = BASE_URI + "/google_map";
 
@@ -70,9 +71,10 @@ public class NetworkApi {
     // 巡线员必经点
     public static final String STAFF_POINT = BASE_URI + "/get_part_point_by_staff";
 
-    // 巡检任务
-    public static final String TASK = BASE_URI + "/tasks";
     // 轨迹
     public static final String ROUTE_MAP = BASE_URI + "/route_map";
+
+    // 更改密码
+    public static final String STAFF_PASSWORD = BASE_URI + "/staff_password";
 
 }

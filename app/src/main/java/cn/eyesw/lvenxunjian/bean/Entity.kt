@@ -15,3 +15,7 @@ data class DataCollectionEntity(var resId: Int, var title: String)
 
 /* 数据信息 */
 data class DataInfoEntity(var dataId: String, var createTime: String, var address: String)
+
+/* 轨迹 */
+data class PositionJsonBean(var staff_id: String, var latitude: Double, var longitude: Double,
+                            var status: Int, var length: Double, var createtime: String)

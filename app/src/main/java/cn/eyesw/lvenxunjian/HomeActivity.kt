@@ -172,7 +172,6 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
                     .map { jsonArray.get(it) as JSONObject }
                     .map { it.getJSONArray("line_parts") }
                     .forEach {
-
                         /* 数据量太大，开启子线程，防止 ANR */
                         object : Thread() {
                             override fun run() {
@@ -301,7 +300,7 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
      */
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            // 巡检轨迹
+        // 巡检轨迹
             R.id.menu_home_patrol_track -> startActivity(PatrolAreaActivity::class.java)
         // 数据采集
             R.id.menu_home_data_collection -> startActivity(DataCollectionActivity::class.java)
@@ -384,7 +383,7 @@ class HomeActivity : BaseActivity(), OnNavigationItemSelectedListener {
                     startTime = System.currentTimeMillis()
                     return true
                 } else {
-                    System.exit(0)
+                    finish()
                 }
             }
         }

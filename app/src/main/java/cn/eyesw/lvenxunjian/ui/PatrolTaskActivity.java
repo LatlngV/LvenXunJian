@@ -58,7 +58,6 @@ import cn.eyesw.lvenxunjian.bean.LatlngEntity;
 import cn.eyesw.lvenxunjian.constant.Constant;
 import cn.eyesw.lvenxunjian.constant.NetworkApi;
 import cn.eyesw.lvenxunjian.service.UpdateClockService;
-import cn.eyesw.lvenxunjian.service.UploadLatlngService;
 import cn.eyesw.lvenxunjian.utils.DensityUtil;
 import cn.eyesw.lvenxunjian.utils.OkHttpManager;
 import cn.eyesw.lvenxunjian.utils.SpUtil;
@@ -77,7 +76,6 @@ public class PatrolTaskActivity extends BaseActivity {
     private String mLatitude;
     private String mAddress;
     private OkHttpManager mOkHttpManager;
-    private JSONArray mPositions;
     private SpUtil mSpUtil;
 
     private Intent mService;
@@ -96,7 +94,8 @@ public class PatrolTaskActivity extends BaseActivity {
     private LatlngEntityDao mLatlngEntityDao;
     private LatlngEntity mLatlngEntity;
     private boolean mIsFirst = true;
-    private Intent mLatLngService;
+    private MyLocationListener myLocationListener = new MyLocationListener();
+    private long mTime;
 
     @BindView(R.id.patrol_task_toolbar)
     protected Toolbar mToolbar;
@@ -122,6 +121,10 @@ public class PatrolTaskActivity extends BaseActivity {
                 case 0:
                     // 获取必经点状态
                     getStaffPointState();
+                    break;
+                case 1:
+                    // 获取打卡状态
+                    getClockStatus();
                     break;
             }
         }
@@ -153,7 +156,7 @@ public class PatrolTaskActivity extends BaseActivity {
         uiSettings.setRotateGesturesEnabled(false);
         // 坐标转换
         mConverter = new CoordinateConverter();
-        mConverter.from(CoordinateConverter.CoordType.COMMON);
+        mConverter.from(CoordinateConverter.CoordType.GPS);
 
         List<PermissionItem> permissions = new ArrayList<>();
         permissions.add(new PermissionItem(Manifest.permission.ACCESS_FINE_LOCATION, "精确位置", R.drawable.permission_ic_location));
@@ -188,7 +191,6 @@ public class PatrolTaskActivity extends BaseActivity {
     }
 
     private void baiduLocation() {
-        MyLocationListener myLocationListener = new MyLocationListener();
         // 定位初始化
         mLocationClient = new LocationClient(getApplicationContext());
         mLocationClient.registerLocationListener(myLocationListener);
@@ -209,14 +211,14 @@ public class PatrolTaskActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // 获取位置
-        getPosition();
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mTextureMapView.onResume();
+        mHandler.sendEmptyMessage(1);
     }
 
     @Override
@@ -229,16 +231,13 @@ public class PatrolTaskActivity extends BaseActivity {
             unregisterReceiver(mTimeReceiver);
             mTimeReceiver = null;
         }
-        // 停止服务
-        if (mService != null) {
-            stopService(mService);
-        }
     }
 
     @Override
     protected void onDestroy() {
         if (mLocationClient != null && mLocationClient.isStarted()) {
             mLocationClient.stop();
+            mLocationClient.unRegisterLocationListener(myLocationListener);
             // 当不需要定位图层时关闭定位图层
             mBaiduMap.setMyLocationEnabled(false);
         }
@@ -256,7 +255,8 @@ public class PatrolTaskActivity extends BaseActivity {
         mOkHttpManager.postAsyncForm(NetworkApi.STAFF_STATUS, map, new OkHttpManager.DataCallback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                showToast("网络连接失败");
+                showToast(getString(R.string.network_error));
+                call.cancel();
             }
 
             @Override
@@ -269,25 +269,26 @@ public class PatrolTaskActivity extends BaseActivity {
                         String status = data.getString("status");
                         if (status.equals("0")) {
                             mBtnStart.setText("开始巡检");
-                            mFlag = true;
-                            if (mLatLngService != null) {
-                                stopService(mLatLngService);
+                            if (mService != null) {
+                                stopService(mService);
                             }
+                            if (mTimeReceiver != null) {
+                                unregisterReceiver(mTimeReceiver);
+                                mTimeReceiver = null;
+                            }
+                            mFlag = true;
                         } else if (status.equals("1")) {
                             mBtnStart.setText("结束巡检");
                             mFlag = false;
                             // 开启服务
-                            long time = data.getLong("time");
+                            mTime = data.getLong("time");
                             mService = new Intent(getApplicationContext(), UpdateClockService.class);
-                            mService.putExtra("timeStamp", new Date().getTime() - time * 1000);
+                            mService.putExtra("timeStamp", new Date().getTime() - mTime * 1000);
+                            mService.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startService(mService);
                             // 注册广播
                             registerBroadcastReceiver();
-                            // 开启定位服务
-                            if (mLatLngService == null) {
-                                mLatLngService = new Intent(getApplicationContext(), UploadLatlngService.class);
-                                startService(mLatLngService);
-                            }
+
                             // 获取必经点的集合
                             getStaffPointState();
                         }
@@ -309,7 +310,9 @@ public class PatrolTaskActivity extends BaseActivity {
         mOkHttpManager.postAsyncForm(NetworkApi.LINE_POINT_LIST, map, new OkHttpManager.DataCallback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                showToast("网络连接失败");
+                mHandler.sendEmptyMessageDelayed(0, 1000 * 20);
+                showToast(getString(R.string.network_error));
+                call.cancel();
             }
 
             @Override
@@ -318,15 +321,16 @@ public class PatrolTaskActivity extends BaseActivity {
                     JSONObject object = new JSONObject(json);
                     int code = object.getInt("code");
                     if (code == 200) {
-                        mPositions = object.getJSONArray("kaoqin_positions");
-                        for (int i = 0; i < mPositions.length(); i++) {
-                            JSONObject data = (JSONObject) mPositions.get(i);
+                        JSONArray positions = object.getJSONArray("kaoqin_positions");
+                        for (int i = 0; i < positions.length(); i++) {
+                            JSONObject data = (JSONObject) positions.get(i);
                             String status = data.getString("status");
                             mStatus.add(status);
                         }
-
                         // 获取管道数据画管线
-                        drawPipeline();
+                        // drawPipeline();
+                        // 显示完成情况
+                        showCompleteSituation();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -362,7 +366,7 @@ public class PatrolTaskActivity extends BaseActivity {
             drawStaffPoint();
         } else { // 结合的长度等于 0，请求网络数据并进行坐标转换，将大地坐标系转换为百度坐标系，将转换的坐标系保存到数据库中
             // 请求管道数据
-            requestPipelineDData();
+            requestPipelineData();
         }
     }
 
@@ -385,9 +389,9 @@ public class PatrolTaskActivity extends BaseActivity {
                 latitude = mLatlngEntity.getLatitude();
                 longitude = mLatlngEntity.getLongitude();
                 mLatLng = new LatLng(latitude, longitude);
-                if (status.equals("1")) {
+                if (status.equals("1")) { // 状态为 1 表示必经点已经到了
                     mBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.route_green);
-                } else if (status.equals("0")) {
+                } else if (status.equals("0")) { // 状态为 0 表示必经点没到
                     mBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.route_red);
                 }
                 OverlayOptions option = new MarkerOptions()
@@ -408,13 +412,15 @@ public class PatrolTaskActivity extends BaseActivity {
     /**
      * 请求管道数据
      */
-    private void requestPipelineDData() {
+    private void requestPipelineData() {
         Map<String, String> map = new HashMap<>();
         map.put("staff_id", mSpUtil.getString("id"));
         mOkHttpManager.postAsyncForm(NetworkApi.PIPELINE_POINT, map, new OkHttpManager.DataCallback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                showToast("网络连接失败");
+                mHandler.sendEmptyMessageDelayed(0, 1000 * 20);
+                showToast(getString(R.string.network_error));
+                call.cancel();
             }
 
             @Override
@@ -464,7 +470,9 @@ public class PatrolTaskActivity extends BaseActivity {
         mOkHttpManager.postAsyncForm(NetworkApi.STAFF_POINT, map, new OkHttpManager.DataCallback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                showToast("网络连接失败");
+                mHandler.sendEmptyMessageDelayed(0, 1000 * 20);
+                showToast(getString(R.string.network_error));
+                call.cancel();
             }
 
             @Override
@@ -485,12 +493,12 @@ public class PatrolTaskActivity extends BaseActivity {
                             longitude = Double.parseDouble(data.getString("longitude"));
                             mLatLng = new LatLng(latitude, longitude);
                             if (status.equals("1")) {
-                                //构建 Marker 图标
+                                // 构建 Marker 图标
                                 mBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.route_green);
                             } else if (status.equals("0")) {
                                 mBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.route_red);
                             }
-                            //创建 OverlayOptions 属性
+                            // 创建 OverlayOptions 属性
                             OverlayOptions option = new MarkerOptions()
                                     .position(mLatLng)
                                     .icon(mBitmapDescriptor);
@@ -518,7 +526,8 @@ public class PatrolTaskActivity extends BaseActivity {
      * 显示完成情况
      */
     private void showCompleteSituation() {
-        mTvPositionTotal.setText(mPositions.length() + "");
+        int size = mStatus.size();
+        mTvPositionTotal.setText(size + "");
 
         // 先判断 LinearLayout 有没有添加子 View，如果有就移除
         if (mFirstLlContainer.getChildCount() > 0 || mSecondLlContainer.getChildCount() > 0) {
@@ -534,7 +543,7 @@ public class PatrolTaskActivity extends BaseActivity {
                 DensityUtil.dip2px(mContext, 22f),
                 DensityUtil.dip2px(mContext, 22f));
         // 动态向 LinearLayout 中添加 TextView
-        for (int i = 0; i < mPositions.length(); i++) {
+        for (int i = 0; i < size; i++) {
             String status = mStatus.get(i);
             textView = new TextView(mContext);
             textView.setGravity(Gravity.CENTER);
@@ -556,14 +565,14 @@ public class PatrolTaskActivity extends BaseActivity {
             if (i == 0) {
                 params.leftMargin = DensityUtil.dip2px(mContext, 5f);
             }
-            if (i == mPositions.length() - 1) {
+            if (i == size - 1) {
                 params.rightMargin = DensityUtil.dip2px(mContext, 10f);
             }
 
             params.leftMargin = DensityUtil.dip2px(mContext, 3f);
             textView.setLayoutParams(params);
 
-            if (i < mPositions.length() / 2 && mPositions.length() > 10) {
+            if (i < size / 2 && size > 10) {
                 mFirstLlContainer.addView(textView);
             } else {
                 mSecondLlContainer.addView(textView);
@@ -573,7 +582,7 @@ public class PatrolTaskActivity extends BaseActivity {
         }
 
         // 判断完成点的个数和总点数相同，不在向服务器请求消息
-        if (position == mPositions.length()) {
+        if (position == size) {
             mHandler.removeCallbacksAndMessages(null);
         } else {
             mHandler.sendEmptyMessageDelayed(0, 1000 * 20);
@@ -589,7 +598,8 @@ public class PatrolTaskActivity extends BaseActivity {
         mOkHttpManager.postAsyncForm(NetworkApi.GPS, map, new OkHttpManager.DataCallback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                showToast("网络连接失败");
+                showToast(getString(R.string.network_error));
+                call.cancel();
             }
 
             @Override
@@ -602,8 +612,8 @@ public class PatrolTaskActivity extends BaseActivity {
                         mLongitude = data.getString("longitude");
                         mLatitude = data.getString("latitude");
                         mAddress = data.getString("address");
-                        // 获取打卡状态
-                        getClockStatus();
+                        // 打卡
+                        isSign();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -620,42 +630,14 @@ public class PatrolTaskActivity extends BaseActivity {
     @OnClick(R.id.patrol_task_btn_start)
     public void onClick() {
         if (mFlag) {
-            mBtnStart.setText("结束巡检");
-
             mFlag = false;
-            // 开启服务
-            mService = new Intent(getApplicationContext(), UpdateClockService.class);
-            mService.putExtra("timeStamp", new Date().getTime());
-            startService(mService);
-            // 注册广播
-            registerBroadcastReceiver();
-
-            // 开启定位服务
-            mLatLngService = new Intent(getApplicationContext(), UploadLatlngService.class);
-            startService(mLatLngService);
-
-            mHandler.removeCallbacksAndMessages(null);
-            // 获取必经点状态
-            getStaffPointState();
-            isSign();
+            getPosition();
         } else {
             new AlertDialog.Builder(this)
                     .setMessage("确定要结束巡检吗？")
                     .setPositiveButton("确定", (dialog, which) -> {
-                        mBtnStart.setText("开始巡检");
                         mFlag = true;
-                        mHandler.removeCallbacksAndMessages(null);
-                        // 关闭服务
-                        stopService(mService);
-                        // 广播解注册
-                        if (mTimeReceiver != null) {
-                            unregisterReceiver(mTimeReceiver);
-                            mTimeReceiver = null;
-                        }
-                        mTvTimer.setText("00:00:00");
-                        // 关闭定位服务
-                        stopService(mLatLngService);
-                        isSign();
+                        getPosition();
                     })
                     .setNegativeButton("取消", null)
                     .show();
@@ -680,7 +662,8 @@ public class PatrolTaskActivity extends BaseActivity {
         mOkHttpManager.postAsyncForm(url(), map, new OkHttpManager.DataCallback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(mContext, "网络连接失败", Toast.LENGTH_SHORT).show();
+                showToast(getString(R.string.network_error));
+                call.cancel();
             }
 
             @Override
@@ -690,8 +673,31 @@ public class PatrolTaskActivity extends BaseActivity {
                     int code = object.getInt("code");
                     if (code == 200) {
                         if (!mFlag) {
+                            mBtnStart.setText("结束巡检");
+
+                            // 开启服务
+                            mService = new Intent(getApplicationContext(), UpdateClockService.class);
+                            mService.putExtra("timeStamp", new Date().getTime());
+                            startService(mService);
+                            // 注册广播
+                            registerBroadcastReceiver();
+
+                            mHandler.removeCallbacksAndMessages(null);
+                            // 获取必经点状态
+                            getStaffPointState();
                             Toast.makeText(mContext, "打卡成功，任务开始", Toast.LENGTH_SHORT).show();
                         } else {
+                            mBtnStart.setText("开始巡检");
+
+                            mHandler.removeCallbacksAndMessages(null);
+                            // 关闭服务
+                            stopService(mService);
+                            // 广播解注册
+                            if (mTimeReceiver != null) {
+                                unregisterReceiver(mTimeReceiver);
+                                mTimeReceiver = null;
+                            }
+                            mTvTimer.setText("00:00:00");
                             Toast.makeText(mContext, "打卡结束，任务结束", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -727,7 +733,6 @@ public class PatrolTaskActivity extends BaseActivity {
      * 百度地图定位实现类
      */
     private class MyLocationListener implements BDLocationListener {
-
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
             if (bdLocation == null || mTextureMapView == null) {
@@ -745,7 +750,7 @@ public class PatrolTaskActivity extends BaseActivity {
             // 设置定位数据
             mBaiduMap.setMyLocationData(myLocationData);
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.marker);
-            MyLocationConfiguration myLocationConfiguration = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.FOLLOWING, true, bitmapDescriptor);
+            MyLocationConfiguration myLocationConfiguration = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, bitmapDescriptor);
             mBaiduMap.setMyLocationConfiguration(myLocationConfiguration);
             LatLng ll = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
             MapStatus.Builder builder = new MapStatus.Builder();
@@ -761,7 +766,6 @@ public class PatrolTaskActivity extends BaseActivity {
      * 时间改变的广播
      */
     private class TimeReceiver extends BroadcastReceiver {
-
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();

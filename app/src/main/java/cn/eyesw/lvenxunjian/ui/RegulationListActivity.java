@@ -111,10 +111,6 @@ public class RegulationListActivity extends BaseActivity {
         Intent intent = new Intent(mContext, RegulationDetailActivity.class);
         intent.putExtra("rule_id", mDatas.get(position).get("id"));
         startActivity(intent);
-
-        //Bundle bundle = new Bundle();
-        //bundle.putString("rule_id", mDatas.get(position).get("id"));
-        //startActivity(RegulationDetailActivity.class, bundle);
     }
 
     private class RegulationAdapter extends BaseListViewAdapter<Map<String, String>> {
